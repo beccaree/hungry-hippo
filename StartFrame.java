@@ -37,7 +37,7 @@ public class StartFrame extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtVideoPath;
 	private String videoPath;
-
+	boolean isVideo = false;
 	
 	/**
 	 * Launch the application.
@@ -116,6 +116,39 @@ public class StartFrame extends JFrame {
 		JButton btnNewButton = new JButton("Ok");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				String cmd = "file "+ videoPath;
+				
+				//Determine if file chosen is a video file
+				ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", cmd);
+				Process process;
+				try {
+					process = processBuilder.start();
+					InputStream output = process.getInputStream();
+					BufferedReader stdout = new BufferedReader(new InputStreamReader(output));
+
+					String line = null;
+					while ((line = stdout.readLine()) != null) {
+						if (line.matches("(.*)video: FFMpeg MPEG-4(.*)")){
+							isVideo = true;
+						}
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+
+				if(isVideo){
+					thisFrame.dispose();
+					JFrame main = new MainFrame();
+					main.setVisible(true);
+					System.out.println("goes to main page");
+					
+				}else{
+					//Navigate to an error dialog
+					System.out.println("goes to error dialog");
+				}			
+
 			}
 		});
 		panel_4.add(btnNewButton);
