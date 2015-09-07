@@ -52,7 +52,6 @@ public class MainFrame extends JFrame {
 		mnFile.add(mntmOpenNewVideo);
 		
 		JPanel screen_play = new JPanel();
-		//contentPane.add(screen_play);
 		screen_play.setLayout(new BorderLayout(0, 0));
 		
 		JPanel screen = new JPanel();
@@ -67,14 +66,29 @@ public class MainFrame extends JFrame {
 		controls.add(video_control);
 		video_control.setLayout(new BoxLayout(video_control, BoxLayout.X_AXIS));
 		
-		JButton btnI = new JButton("l <<");
-		video_control.add(btnI);
+		JButton btnReverse = new JButton("l <<");
+		btnReverse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//should continue rewinding until user clicks play
+			}
+		});
+		video_control.add(btnReverse);
 		
-		JButton btnll = new JButton("> / l l");
-		video_control.add(btnll);
+		JButton btnPlayPause = new JButton("> / l l");
+		btnPlayPause.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//play or pause video
+			}
+		});
+		video_control.add(btnPlayPause);
 		
-		JButton btnNewButton = new JButton(">> l");
-		video_control.add(btnNewButton);
+		JButton btnForward = new JButton(">> l");
+		btnForward.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//should continue forwarding until user clicks play
+			}
+		});
+		video_control.add(btnForward);
 		
 		JPanel volume_control = new JPanel();
 		controls.add(volume_control);
@@ -92,6 +106,11 @@ public class MainFrame extends JFrame {
 		panel_1.add(slider);
 		
 		JButton btnMute = new JButton("Mute");
+		btnMute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//mute the sound when clicked, unmute when clicked again
+			}
+		});
 		panel_1.add(btnMute);
 		
 		JPanel audio_editing = new JPanel();
@@ -112,9 +131,19 @@ public class MainFrame extends JFrame {
 		audio_editing.add(audio_options);
 		
 		JButton btnSpeak = new JButton("Speak");
+		btnSpeak.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//use festival to speak out what the user has inputed in text area
+			}
+		});
 		audio_options.add(btnSpeak);
 		
 		JButton btnSaveAs = new JButton("Save as MP3");
+		btnSaveAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//save input in textarea as .wav file and convert to .mp3 and save
+			}
+		});
 		audio_options.add(btnSaveAs);
 		
 		JPanel panel = new JPanel();
@@ -122,6 +151,12 @@ public class MainFrame extends JFrame {
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JButton btnNewButton_1 = new JButton("Merge With MP3");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//merge mp3 with current video 
+				//prompt user to choose mp3 file to merge with
+			}
+		});
 		panel.add(btnNewButton_1);
 	}
 
