@@ -29,8 +29,6 @@ import javax.swing.JSplitPane;
 
 public class MainFrame extends JFrame {
 
-	private JPanel contentPane;
-
 	/**
 	 * Create the frame.
 	 */
@@ -52,10 +50,6 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnFile.add(mntmOpenNewVideo);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 		
 		JPanel screen_play = new JPanel();
 		//contentPane.add(screen_play);
@@ -103,7 +97,7 @@ public class MainFrame extends JFrame {
 		JPanel audio_editing = new JPanel();
 		
 		JSplitPane splitPane = new JSplitPane();
-		contentPane.add(splitPane);
+		setContentPane(splitPane);
 		splitPane.setLeftComponent(screen_play);
 		splitPane.setRightComponent(audio_editing);
 		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
