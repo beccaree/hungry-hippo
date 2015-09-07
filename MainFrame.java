@@ -26,8 +26,12 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 
+import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
+import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
 
 public class MainFrame extends JFrame {
+	
+	private int festID; //for saving the ID of festival for killing later
 
 	/**
 	 * Create the frame.
@@ -56,6 +60,8 @@ public class MainFrame extends JFrame {
 		
 		JPanel screen = new JPanel();
 		screen.setBackground(Color.BLACK);
+		//EmbeddedMediaPlayerComponent screen = new EmbeddedMediaPlayerComponent();
+		//screen.getMediaPlayer().playMedia("bunny.avi");
 		screen_play.add(screen, BorderLayout.CENTER);
 		
 		JPanel controls = new JPanel();
@@ -134,6 +140,14 @@ public class MainFrame extends JFrame {
 		btnSpeak.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//use festival to speak out what the user has inputed in text area
+				if(btnSpeak.getText().equals("Speak")) {
+					btnSpeak.setText("Stop");
+					//execute background process of festival
+					//return something when completed and change button back to speak
+				} else {
+					btnSpeak.setText("Speak");
+					//kill the festival process
+				}
 			}
 		});
 		audio_options.add(btnSpeak);
