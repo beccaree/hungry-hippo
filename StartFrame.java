@@ -1,19 +1,33 @@
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+
 import java.awt.Font;
 import java.awt.FlowLayout;
+
 import javax.swing.JTextField;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
+
+
+
+//import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 
@@ -22,7 +36,9 @@ public class StartFrame extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField txtVideoPath;
-
+	private String videoPath;
+	boolean isVideo = false;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -71,7 +87,15 @@ public class StartFrame extends JFrame {
 		JButton btnBrowse = new JButton("Browse");
 		btnBrowse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				 
+				JFileChooser videoChooser = new JFileChooser();
+				    FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 File", "mp3");
+				    videoChooser.setFileFilter(filter);
+				    int okReturnVal = videoChooser.showOpenDialog(getParent());
+				    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
+				    	videoPath = videoChooser.getSelectedFile().getPath();
+				       txtVideoPath.setText(videoPath);
+				    }
 			}
 		});
 		panel_1.add(btnBrowse);
@@ -92,9 +116,39 @@ public class StartFrame extends JFrame {
 		JButton btnNewButton = new JButton("Ok");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				thisFrame.dispose();
-				JFrame main = new MainFrame();
-				main.setVisible(true);
+				
+				String cmd = "file "+ videoPath;
+				
+				//Determine if file chosen is a video file
+				ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", cmd);
+				Process process;
+				try {
+					process = processBuilder.start();
+					InputStream output = process.getInputStream();
+					BufferedReader stdout = new BufferedReader(new InputStreamReader(output));
+
+					String line = null;
+					while ((line = stdout.readLine()) != null) {
+						if (line.matches("(.*)video: FFMpeg MPEG-4(.*)")){
+							isVideo = true;
+						}
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+
+				if(isVideo){
+					thisFrame.dispose();
+					JFrame main = new MainFrame();
+					main.setVisible(true);
+					System.out.println("goes to main page");
+					
+				}else{
+					//Navigate to an error dialog
+					System.out.println("goes to error dialog");
+				}			
+
 			}
 		});
 		panel_4.add(btnNewButton);
@@ -106,7 +160,7 @@ public class StartFrame extends JFrame {
 			}
 		});
 		panel_4.add(btnCancel);
-		panel.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{panel_1, panel_2}));
+		//panel.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{panel_1, panel_2}));
 	}
 
 }
