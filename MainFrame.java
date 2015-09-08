@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Insets;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -26,8 +27,11 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 
-import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
+import java.awt.Component;
+import javax.swing.SwingConstants;
+
+//import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
+//import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
 
 public class MainFrame extends JFrame {
 	
@@ -120,6 +124,8 @@ public class MainFrame extends JFrame {
 		panel_1.add(btnMute);
 		
 		JPanel audio_editing = new JPanel();
+		audio_editing.setMinimumSize(new Dimension(300, 500));
+		screen_play.setMinimumSize(new Dimension(300, 500));
 		
 		JSplitPane splitPane = new JSplitPane();
 		setContentPane(splitPane);
@@ -128,15 +134,25 @@ public class MainFrame extends JFrame {
 		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
 		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
 		
+		JPanel panel_2 = new JPanel();
+		audio_editing.add(panel_2);
+		
+		JLabel lblEnterYourCommentary = new JLabel("Enter your commentary below:");
+		lblEnterYourCommentary.setHorizontalAlignment(SwingConstants.LEFT);
+		lblEnterYourCommentary.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		lblEnterYourCommentary.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		audio_editing.add(lblEnterYourCommentary);
+		
 		JTextArea txtrCommentary = new JTextArea();
-		txtrCommentary.setText("Type your commentary here...");
-		txtrCommentary.setPreferredSize(new Dimension(300, 550));
+		txtrCommentary.setText("(max 40 words)");
+		txtrCommentary.setLineWrap(true);
+		txtrCommentary.setPreferredSize(new Dimension(270, 300));
 		audio_editing.add(txtrCommentary);
 		
 		JPanel audio_options = new JPanel();
 		audio_editing.add(audio_options);
 		
-		JButton btnSpeak = new JButton("Speak");
+		final JButton btnSpeak = new JButton("Speak");
 		btnSpeak.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//use festival to speak out what the user has inputed in text area
@@ -164,14 +180,14 @@ public class MainFrame extends JFrame {
 		audio_editing.add(panel);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JButton btnNewButton_1 = new JButton("Merge With MP3");
-		btnNewButton_1.addActionListener(new ActionListener() {
+		JButton btnMerge = new JButton("Merge With MP3");
+		btnMerge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//merge mp3 with current video 
 				//prompt user to choose mp3 file to merge with
 			}
 		});
-		panel.add(btnNewButton_1);
+		panel.add(btnMerge);
 	}
 
 }
