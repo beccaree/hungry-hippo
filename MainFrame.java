@@ -1,11 +1,9 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Insets;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -34,8 +32,6 @@ import javax.swing.SwingConstants;
 //import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
 
 public class MainFrame extends JFrame {
-	
-	private int festID; //for saving the ID of festival for killing later
 
 	/**
 	 * Create the frame.
@@ -119,6 +115,13 @@ public class MainFrame extends JFrame {
 		btnMute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//mute the sound when clicked, unmute when clicked again
+				if(btnMute.getText().equals("Mute")) {
+					btnMute.setText("UnMute");
+					//video.mute(); //toggles mute for the video
+				} else {
+					btnMute.setText("Mute");
+					//video.mute(); //toggles mute for the video
+				}
 			}
 		});
 		panel_1.add(btnMute);
@@ -140,7 +143,7 @@ public class MainFrame extends JFrame {
 		JLabel lblEnterYourCommentary = new JLabel("Enter your commentary below:");
 		lblEnterYourCommentary.setHorizontalAlignment(SwingConstants.LEFT);
 		lblEnterYourCommentary.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		lblEnterYourCommentary.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblEnterYourCommentary.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		audio_editing.add(lblEnterYourCommentary);
 		
 		JTextArea txtrCommentary = new JTextArea();
@@ -159,6 +162,11 @@ public class MainFrame extends JFrame {
 				if(btnSpeak.getText().equals("Speak")) {
 					btnSpeak.setText("Stop");
 					//execute background process of festival
+					String input = txtrCommentary.getText();
+					System.out.println(input);
+					BackgroundTask bg = new BackgroundTask(input);
+					bg.execute();
+					
 					//return something when completed and change button back to speak
 				} else {
 					btnSpeak.setText("Speak");
