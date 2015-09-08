@@ -146,6 +146,9 @@ public class StartFrame extends JFrame {
 					
 				}else{
 					//Navigate to an error dialog
+					thisFrame.dispose();
+					JDialog errorDialog = new StartErrorDialog();
+					errorDialog.setVisible(true);
 					System.out.println("goes to error dialog");
 				}			
 
