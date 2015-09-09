@@ -6,6 +6,9 @@ import java.awt.Insets;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -28,6 +31,11 @@ import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 
 import java.awt.Component;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import javax.swing.SwingConstants;
 
 //import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
@@ -36,6 +44,8 @@ import javax.swing.SwingConstants;
 public class MainFrame extends JFrame {
 	
 	private int festID; //for saving the ID of festival for killing later
+	private String videoPath;
+	boolean isVideo = false;
 
 	/**
 	 * Create the frame.
@@ -49,12 +59,49 @@ public class MainFrame extends JFrame {
 		setJMenuBar(menuBar);
 		
 		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
+		menuBar.add(mnFile);		
 		
 		JMenuItem mntmOpenNewVideo = new JMenuItem("Open New Video...");
 		mntmOpenNewVideo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//changing the video that we are editing
+				//Open file chooser
+				JFileChooser videoChooser = new JFileChooser();
+			    FileNameExtensionFilter filter = new FileNameExtensionFilter("AVI File", "avi");
+			    videoChooser.setFileFilter(filter);
+			    int okReturnVal = videoChooser.showOpenDialog(getParent());
+			    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
+			    	videoPath = videoChooser.getSelectedFile().getPath();
+			    	
+			    	String cmd = "file "+ videoPath;
+					//Determine if file chosen is a video file
+					ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", cmd);
+					Process process;
+					try {
+						process = processBuilder.start();
+						InputStream output = process.getInputStream();
+						BufferedReader stdout = new BufferedReader(new InputStreamReader(output));
+
+						String line = null;
+						while ((line = stdout.readLine()) != null) {
+							if (line.matches("(.*)video: FFMpeg MPEG-4(.*)")){
+								isVideo = true;
+							}
+						}
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					
+
+					if(!isVideo){
+						//Navigate to an error dialog on top of MainFrame
+						JDialog errorDialog = new StartErrorDialog();
+						errorDialog.setVisible(true);
+						System.out.println("goes to error dialog");
+					}else{
+				    	//TO DO:Change name of current video editing if it is a video
+					}
+			    }
 			}
 		});
 		mnFile.add(mntmOpenNewVideo);
@@ -191,3 +238,4 @@ public class MainFrame extends JFrame {
 	}
 
 }
+
