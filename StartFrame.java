@@ -89,7 +89,7 @@ public class StartFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				 
 				JFileChooser videoChooser = new JFileChooser();
-				    FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 File", "mp3");
+				    FileNameExtensionFilter filter = new FileNameExtensionFilter("AVI File", "avi");
 				    videoChooser.setFileFilter(filter);
 				    int okReturnVal = videoChooser.showOpenDialog(getParent());
 				    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
@@ -146,6 +146,9 @@ public class StartFrame extends JFrame {
 					
 				}else{
 					//Navigate to an error dialog
+					thisFrame.dispose();
+					JDialog errorDialog = new StartErrorDialog();
+					errorDialog.setVisible(true);
 					System.out.println("goes to error dialog");
 				}			
 
