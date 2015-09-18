@@ -1,16 +1,17 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import javax.swing.SwingWorker;
 
-public class BackgroundTask extends SwingWorker<Void, Void> {
+public class BgFestival extends SwingWorker<Void, Void> {
 		
 		protected int festID;
 		
 		private String input;
 		
-		public BackgroundTask(String input) {
+		public BgFestival(String input) {
 			this.input = input;
 		}
 
@@ -38,4 +39,6 @@ public class BackgroundTask extends SwingWorker<Void, Void> {
 
 			return null;
 		}
+	
 	}
+
