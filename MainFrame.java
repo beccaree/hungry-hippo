@@ -26,13 +26,17 @@ import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 
 import java.awt.Component;
+import java.io.IOException;
+
 import javax.swing.SwingConstants;
 
 //import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
 //import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
 
 public class MainFrame extends JFrame {
-
+	
+	int festID = 0; //because process ID is very unlikely to be 0
+	
 	/**
 	 * Create the frame.
 	 */
@@ -111,7 +115,7 @@ public class MainFrame extends JFrame {
 		JSlider slider = new JSlider();
 		panel_1.add(slider);
 		
-		JButton btnMute = new JButton("Mute");
+		final JButton btnMute = new JButton("Mute");
 		btnMute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//mute the sound when clicked, unmute when clicked again
@@ -140,13 +144,13 @@ public class MainFrame extends JFrame {
 		JPanel panel_2 = new JPanel();
 		audio_editing.add(panel_2);
 		
-		JLabel lblEnterYourCommentary = new JLabel("Enter your commentary below:");
+		JLabel lblEnterYourCommentary = new JLabel("Commentary here:");
 		lblEnterYourCommentary.setHorizontalAlignment(SwingConstants.LEFT);
 		lblEnterYourCommentary.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		lblEnterYourCommentary.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		audio_editing.add(lblEnterYourCommentary);
 		
-		JTextArea txtrCommentary = new JTextArea();
+		final JTextArea txtrCommentary = new JTextArea();
 		txtrCommentary.setText("(max 40 words)");
 		txtrCommentary.setLineWrap(true);
 		txtrCommentary.setPreferredSize(new Dimension(270, 300));
@@ -155,26 +159,37 @@ public class MainFrame extends JFrame {
 		JPanel audio_options = new JPanel();
 		audio_editing.add(audio_options);
 		
-		final JButton btnSpeak = new JButton("Speak");
+		JButton btnSpeak = new JButton("Speak");
 		btnSpeak.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//use festival to speak out what the user has inputed in text area
-				if(btnSpeak.getText().equals("Speak")) {
-					btnSpeak.setText("Stop");
-					//execute background process of festival
-					String input = txtrCommentary.getText();
-					System.out.println(input);
-					BackgroundTask bg = new BackgroundTask(input);
-					bg.execute();
 					
-					//return something when completed and change button back to speak
-				} else {
-					btnSpeak.setText("Speak");
-					//kill the festival process
-				}
+				//execute background process of festival
+				String input = txtrCommentary.getText();
+				BgFestival bg = new BgFestival(input);
+				bg.execute();
 			}
 		});
 		audio_options.add(btnSpeak);
+		
+		JButton btnStop = new JButton("Stop");
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//kill the process --------------------------------------------------------not working yet
+				if(festID != 0) {
+					String cmd = "kill "+(festID+4);
+					ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
+					try {
+						builder.start();
+						festID = 0;
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		audio_options.add(btnStop);
 		
 		JButton btnSaveAs = new JButton("Save as MP3");
 		btnSaveAs.addActionListener(new ActionListener() {
