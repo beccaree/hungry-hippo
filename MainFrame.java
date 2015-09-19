@@ -12,6 +12,8 @@ import javax.swing.Timer;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BoxLayout;
 
@@ -32,6 +34,7 @@ import java.io.IOException;
 import javax.swing.SwingConstants;
 
 import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
+import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
 
 public class MainFrame extends JFrame {
@@ -49,6 +52,8 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
 		
+		
+		//Top menu bar implementation -------------------------------------------------->
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
@@ -63,9 +68,12 @@ public class MainFrame extends JFrame {
 		});
 		mnFile.add(mntmOpenNewVideo);
 		
-		JPanel videoPane = new JPanel();
+		
+		//Video player implementation -------------------------------------------------->
+		JPanel videoPane = new JPanel(); //left side of the split pane
         videoPane.setLayout(new BorderLayout());
-
+        
+        //add a media component
         component = new EmbeddedMediaPlayerComponent();
         videoPane.add(component, BorderLayout.CENTER);
         video = component.getMediaPlayer();
@@ -78,13 +86,13 @@ public class MainFrame extends JFrame {
 		controls.add(progress);
 		progress.setLayout(new BoxLayout(progress, BoxLayout.X_AXIS));
 		
-		final JLabel lblTime = new JLabel("0 secs");
+		final JLabel lblTime = new JLabel("0 secs"); //time label for the GUI
 		progress.add(lblTime);
 		
-		final JProgressBar bar = new JProgressBar();
+		final JProgressBar bar = new JProgressBar(); //progress bar of the GUI
 		progress.add(bar);
 
-		JPanel video_control = new JPanel();
+		JPanel video_control = new JPanel(); //panel for holding all the control buttons (play/pause, rewind, forward)
 		controls.add(video_control);
 		video_control.setLayout(new BoxLayout(video_control, BoxLayout.X_AXIS));
 		
@@ -119,11 +127,11 @@ public class MainFrame extends JFrame {
 		});
 		video_control.add(btnForward);
 		
-		JPanel volume_control = new JPanel();
+		JPanel volume_control = new JPanel(); //panel for holding the volume control buttons (jslider and mute btn)
 		controls.add(volume_control);
 		volume_control.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_1 = new JPanel();
+		JPanel panel_1 = new JPanel(); //panel used for layout purposes
 		volume_control.add(panel_1, BorderLayout.SOUTH);
 		panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
@@ -148,18 +156,14 @@ public class MainFrame extends JFrame {
 			}
 		});
 		panel_1.add(btnMute);
-		
-		JPanel audio_editing = new JPanel();
-		audio_editing.setMinimumSize(new Dimension(300, 500));
 		videoPane.setMinimumSize(new Dimension(300, 500));
 		
-		JSplitPane splitPane = new JSplitPane();
-		setContentPane(splitPane);
-		splitPane.setLeftComponent(videoPane);
-		splitPane.setRightComponent(audio_editing);
-		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
-		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
+		//Audio editing implementation ---------------------------------------------------->
 		
+		JPanel audio_editing = new JPanel(); //the right side of the split pane
+		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
+		audio_editing.setMinimumSize(new Dimension(300, 500));
+	
 		JPanel panel_2 = new JPanel();
 		audio_editing.add(panel_2);
 		
@@ -231,9 +235,27 @@ public class MainFrame extends JFrame {
 		});
 		panel.add(btnMerge);
 		
-		this.setVisible(true);
 		
-		video.playMedia("bunny.avi");
+		//Adding the two different panels to the two sided of the split pane ---------------->
+		JSplitPane splitPane = new JSplitPane();
+		setContentPane(splitPane);
+		splitPane.setLeftComponent(videoPane);
+		splitPane.setRightComponent(audio_editing);
+		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
+		
+		
+		//video manipulation implementation ------------------------------------------------->
+		this.setVisible(true); //set the frame to visible before playing the video
+		
+		video.playMedia("bunny.avi"); //play the video
+		
+		video.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
+		    @Override
+		    public void finished(MediaPlayer mediaPlayer) {
+		        //button to play when media player finished playing...
+		    	btnPlay.setText(">");
+		    }
+		});
 		
 		int length = 0;
 		while(length == 0) {
@@ -250,6 +272,20 @@ public class MainFrame extends JFrame {
 			}
 		});
 		timer.start();
+		
+		//to fix problem for video being muted when last video exits while muted.
+	    addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+            	e.getWindow().dispose();
+            	//if the video is muted, unmuted before exiting the program
+            	if(btnMute.getText() == "UnMute") {
+		    		video.mute();
+		    	}
+            }
+        });
 	}
 
 }
