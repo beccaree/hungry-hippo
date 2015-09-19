@@ -66,14 +66,9 @@ public class saveAsDialog extends JDialog {
 
                 okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
+						
 				   		if (commentary != null) {
-				   			
-				   			String words = commentary;
-				   			StringTokenizer st = new StringTokenizer(words);
-				   			st.countTokens();
-				   			
-				   			if (st.countTokens() <= 40){
-				   				
+				   		
 							try {
 
 								textPath = System.getProperty("user.dir")+ "/commentary.txt";
@@ -95,10 +90,7 @@ public class saveAsDialog extends JDialog {
 							} catch (IOException e1) {
 								e1.printStackTrace();
 							}
-				   			}else{
-				   				System.out.println("too many words, nothing created");
-				   			}
-							
+		
 							thisDialog.dispose();
 
 						}
