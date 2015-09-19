@@ -218,6 +218,8 @@ public class MainFrame extends JFrame {
 		btnSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//save input in textarea as .wav file and convert to .mp3 and save
+				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
+				saveDialog.setVisible(true);
 			}
 		});
 		audio_options.add(btnSaveAs);
