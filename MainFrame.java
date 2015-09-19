@@ -7,13 +7,13 @@ import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JProgressBar;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.BoxLayout;
 
-import java.awt.Color;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -30,12 +30,15 @@ import java.io.IOException;
 
 import javax.swing.SwingConstants;
 
-//import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
-//import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
+import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause(), play()
+import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
 
 public class MainFrame extends JFrame {
 	
 	int festID = 0; //because process ID is very unlikely to be 0
+	
+	private final EmbeddedMediaPlayerComponent component;
+	private final MediaPlayer video;
 	
 	/**
 	 * Create the frame.
@@ -59,18 +62,26 @@ public class MainFrame extends JFrame {
 		});
 		mnFile.add(mntmOpenNewVideo);
 		
-		JPanel screen_play = new JPanel();
-		screen_play.setLayout(new BorderLayout(0, 0));
-		
-		JPanel screen = new JPanel();
-		screen.setBackground(Color.BLACK);
-		//EmbeddedMediaPlayerComponent screen = new EmbeddedMediaPlayerComponent();
-		//screen.getMediaPlayer().playMedia("bunny.avi");
-		screen_play.add(screen, BorderLayout.CENTER);
+		JPanel videoPane = new JPanel();
+        videoPane.setLayout(new BorderLayout());
+
+        component = new EmbeddedMediaPlayerComponent();
+        videoPane.add(component, BorderLayout.CENTER);
+        video = component.getMediaPlayer();
 		
 		JPanel controls = new JPanel();
-		screen_play.add(controls, BorderLayout.SOUTH);
+		videoPane.add(controls, BorderLayout.SOUTH);
 		controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
+		
+		JPanel progress = new JPanel();
+		controls.add(progress);
+		progress.setLayout(new BoxLayout(progress, BoxLayout.X_AXIS));
+		
+		JLabel time = new JLabel("0 secs");
+		progress.add(time);
+		
+		JProgressBar bar = new JProgressBar();
+		progress.add(bar);
 		
 		JPanel video_control = new JPanel();
 		controls.add(video_control);
@@ -84,13 +95,20 @@ public class MainFrame extends JFrame {
 		});
 		video_control.add(btnReverse);
 		
-		JButton btnPlayPause = new JButton("> / l l");
-		btnPlayPause.addActionListener(new ActionListener() {
+		final JButton btnPlay = new JButton("ll");
+		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//play or pause video
+				if(btnPlay.getText().equals(">")) {
+					btnPlay.setText("ll");
+					video.play(); //play the video
+				} else {
+					btnPlay.setText(">");
+					video.pause(); //pause the video
+				}
 			}
 		});
-		video_control.add(btnPlayPause);
+		video_control.add(btnPlay);
 		
 		JButton btnForward = new JButton(">> l");
 		btnForward.addActionListener(new ActionListener() {
@@ -121,10 +139,10 @@ public class MainFrame extends JFrame {
 				//mute the sound when clicked, unmute when clicked again
 				if(btnMute.getText().equals("Mute")) {
 					btnMute.setText("UnMute");
-					//video.mute(); //toggles mute for the video
+					video.mute(); //toggles mute for the video
 				} else {
 					btnMute.setText("Mute");
-					//video.mute(); //toggles mute for the video
+					video.mute(); //toggles mute for the video
 				}
 			}
 		});
@@ -132,11 +150,11 @@ public class MainFrame extends JFrame {
 		
 		JPanel audio_editing = new JPanel();
 		audio_editing.setMinimumSize(new Dimension(300, 500));
-		screen_play.setMinimumSize(new Dimension(300, 500));
+		videoPane.setMinimumSize(new Dimension(300, 500));
 		
 		JSplitPane splitPane = new JSplitPane();
 		setContentPane(splitPane);
-		splitPane.setLeftComponent(screen_play);
+		splitPane.setLeftComponent(videoPane);
 		splitPane.setRightComponent(audio_editing);
 		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
 		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
@@ -211,6 +229,10 @@ public class MainFrame extends JFrame {
 			}
 		});
 		panel.add(btnMerge);
+		
+		this.setVisible(true);
+		
+		video.playMedia("bunny.avi");
 	}
 
 }
