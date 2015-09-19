@@ -82,12 +82,13 @@ public class saveAsDialog extends JDialog {
 								System.out.println("soundwas created");
 								
 								cmd = "ffmpeg -i sound.wav " + textField.getText() + ".mp3";
+								Thread.sleep(150);
 								builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 								process = builder.start();
 								
 								System.out.println("MP3 created");
 								
-							} catch (IOException e1) {
+							} catch (IOException | InterruptedException e1) {
 								e1.printStackTrace();
 							}
 		
