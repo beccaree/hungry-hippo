@@ -40,6 +40,7 @@ import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 public class MainFrame extends JFrame {
 	
 	int festID = 0; //because process ID is very unlikely to be 0
+	static boolean playClicked = false;
 	
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
@@ -96,21 +97,38 @@ public class MainFrame extends JFrame {
 		controls.add(video_control);
 		video_control.setLayout(new BoxLayout(video_control, BoxLayout.X_AXIS));
 		
-		JButton btnReverse = new JButton("l <<");
-		btnReverse.addActionListener(new ActionListener() {
+		JButton btnSkipBack = new JButton("<<");
+		final JButton btnRewind = new JButton("l <<");
+		final JButton btnPlay = new JButton("ll");
+		final JButton btnForward = new JButton(">> l");
+		JButton btnSkipForward = new JButton(">>");
+		
+		btnSkipBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//should continue rewinding until user clicks play
+				//skips backward 5 seconds every time it is clicked
+				video.skip(-5000);
 			}
 		});
-		video_control.add(btnReverse);
+		video_control.add(btnSkipBack);
 		
-		final JButton btnPlay = new JButton("ll");
+		btnRewind.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//should continue rewinding until user clicks play
+				playClicked = false;
+				btnPlay.setText(">"); //first set button to play
+				BgForward rewind = new BgForward(-500, video); //make a new background task
+				rewind.execute();
+			}
+		});
+		video_control.add(btnRewind);
+		
 		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//play or pause video
 				if(btnPlay.getText().equals(">")) {
 					btnPlay.setText("ll");
 					video.play(); //play the video
+					playClicked = true;
 				} else {
 					btnPlay.setText(">");
 					video.pause(); //pause the video
@@ -118,14 +136,25 @@ public class MainFrame extends JFrame {
 			}
 		});
 		video_control.add(btnPlay);
-		
-		JButton btnForward = new JButton(">> l");
+
 		btnForward.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//should continue forwarding until user clicks play
+				playClicked = false;
+				BgForward forward = new BgForward(500, video); //make a new background task
+				btnPlay.setText(">"); //first set button to play
+				forward.execute();
 			}
 		});
 		video_control.add(btnForward);
+		
+		btnSkipForward.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//skips forward 5 seconds every time it is clicked
+				video.skip(5000);
+			}
+		});
+		video_control.add(btnSkipForward);
 		
 		JPanel volume_control = new JPanel(); //panel for holding the volume control buttons (jslider and mute btn)
 		controls.add(volume_control);
@@ -218,8 +247,6 @@ public class MainFrame extends JFrame {
 		btnSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//save input in textarea as .wav file and convert to .mp3 and save
-				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
-				saveDialog.setVisible(true);
 			}
 		});
 		audio_options.add(btnSaveAs);
@@ -266,11 +293,11 @@ public class MainFrame extends JFrame {
 		
 		bar.setMaximum(length);
 		
+		//timer for updating the label and progress bar every second
 		Timer timer = new Timer(500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// update the label every second
-				lblTime.setText((video.getTime())/1000+ " secs");
-				bar.setValue((int)(video.getTime())/1000);
+				lblTime.setText((video.getTime())/1000+ " secs"); //update the label
+				bar.setValue((int)(video.getTime())/1000); //update the progressbar
 			}
 		});
 		timer.start();
