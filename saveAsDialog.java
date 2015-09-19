@@ -3,21 +3,22 @@ import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import java.awt.GridLayout;
-
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.StringTokenizer;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 
 public class saveAsDialog extends JDialog {
@@ -28,6 +29,7 @@ public class saveAsDialog extends JDialog {
 	private String textPath;
 	private ProcessBuilder builder;
 	private Process process;
+	private String dir;
 	
     /**
      * Create the dialog.
@@ -35,6 +37,8 @@ public class saveAsDialog extends JDialog {
     public saveAsDialog(final String commentary) {
     	
     	final JDialog thisDialog = this;
+    	dir = System.getProperty("user.dir") + "/MP3 Files/";
+    	new File(dir).mkdir();
     	
         setBounds(200, 200, 450, 250);
         getContentPane().setLayout(new BorderLayout());
@@ -71,31 +75,48 @@ public class saveAsDialog extends JDialog {
 				   		
 							try {
 
-								textPath = System.getProperty("user.dir")+ "/commentary.txt";
+								textPath = System.getProperty("user.dir")+ "/.commentary.txt";
 								BufferedWriter bw = new BufferedWriter(new FileWriter(textPath, false));
 								bw.write(commentary);
 								bw.close();
 
-								cmd = "text2wave " + textPath + " -o sound.wav";
+								cmd = "text2wave " + textPath + " -o .sound.wav";
 								builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 								process = builder.start();
 								System.out.println("soundwas created");
 								
-								cmd = "ffmpeg -i sound.wav " + textField.getText() + ".mp3";
-								Thread.sleep(150);
+								
+								cmd = "find | grep -x \"./MP3 Files/" + textField.getText() +".mp3\" | wc -l";
+								System.out.println(cmd);
 								builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 								process = builder.start();
 								
+								builder.redirectErrorStream(true);
+								InputStream stdout = process.getInputStream();
+								InputStream stderr = process.getErrorStream();
+								BufferedReader stdoutBuffered =	new BufferedReader(new InputStreamReader(stdout));
+								String line = stdoutBuffered.readLine();								
+								
+								if(line.equals("0")){
+									cmd = "ffmpeg -i .sound.wav " + "\'MP3 Files/" + textField.getText() + ".mp3\'";
+									Thread.sleep(200);
+									System.out.println(cmd);
+									builder = new ProcessBuilder("/bin/bash", "-c", cmd);
+									process = builder.start();
+								
 								System.out.println("MP3 created");
+								
+								thisDialog.dispose();
+								
+								}else{
+									JOptionPane.showMessageDialog(thisDialog, "This name is taken. Please choose another.");
+								}
 								
 							} catch (IOException | InterruptedException e1) {
 								e1.printStackTrace();
-							}
-		
-							thisDialog.dispose();
+							}		
 
-						}
-						
+						}						
 					}
                 });
                 okButton.setActionCommand("OK");
