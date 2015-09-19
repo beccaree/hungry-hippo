@@ -15,14 +15,9 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import java.awt.Font;
-import java.awt.FlowLayout;
 
 import javax.swing.JTextField;
 
-
-
-//import org.eclipse.wb.swing.FocusTraversalOnArray;
-import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,12 +84,12 @@ public class StartFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				 
 				JFileChooser videoChooser = new JFileChooser();
-				    FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 File", "mp3");
+				    FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
 				    videoChooser.setFileFilter(filter);
 				    int okReturnVal = videoChooser.showOpenDialog(getParent());
 				    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
 				    	videoPath = videoChooser.getSelectedFile().getPath();
-				       txtVideoPath.setText(videoPath);
+				    	txtVideoPath.setText(videoPath);
 				    }
 			}
 		});
@@ -103,7 +98,7 @@ public class StartFrame extends JFrame {
 		JPanel panel_2 = new JPanel();
 		panel.add(panel_2);
 		
-		JCheckBox chckbxDefaultVid = new JCheckBox("Use Default Video"); //getState() returns boolean, true if on and false if off
+		JCheckBox chckbxDefaultVid = new JCheckBox("Use Bunny Video"); //isSelected() returns boolean, true if on and false if off
 		panel_2.add(chckbxDefaultVid);
 		
 		JPanel panel_3 = new JPanel();
@@ -136,14 +131,14 @@ public class StartFrame extends JFrame {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				
 
-				if(isVideo){
+				if(chckbxDefaultVid.isSelected()) { //if the user chooses to use the bunny video
 					thisFrame.dispose();
-					JFrame main = new MainFrame();
-					System.out.println("goes to main page");
-					
-				}else{
+					new MainFrame("bunny.avi");
+				} else if(isVideo){ //if the user has chosen a video for themselves
+					thisFrame.dispose();
+					new MainFrame(videoPath);	
+				} else { //if the user has not chosen a video
 					//Navigate to an error dialog
 					System.out.println("goes to error dialog");
 				}			
@@ -159,7 +154,6 @@ public class StartFrame extends JFrame {
 			}
 		});
 		panel_4.add(btnCancel);
-		//panel.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{panel_1, panel_2}));
 	}
 
 }
