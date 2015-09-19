@@ -75,38 +75,28 @@ public class saveAsDialog extends JDialog {
 				   		
 							try {
 
-								textPath = System.getProperty("user.dir")+ "/.commentary.txt";
+							textPath = System.getProperty("user.dir")+ "/.commentary.txt";
 								BufferedWriter bw = new BufferedWriter(new FileWriter(textPath, false));
 								bw.write(commentary);
 								bw.close();
 
 								cmd = "text2wave " + textPath + " -o .sound.wav";
-								builder = new ProcessBuilder("/bin/bash", "-c", cmd);
-								process = builder.start();
-								System.out.println("soundwas created");
-								
+								startProcess(cmd);		
 								
 								cmd = "find | grep -x \"./MP3 Files/" + textField.getText() +".mp3\" | wc -l";
-								System.out.println(cmd);
-								builder = new ProcessBuilder("/bin/bash", "-c", cmd);
-								process = builder.start();
+								startProcess(cmd);
 								
 								builder.redirectErrorStream(true);
 								InputStream stdout = process.getInputStream();
-								InputStream stderr = process.getErrorStream();
 								BufferedReader stdoutBuffered =	new BufferedReader(new InputStreamReader(stdout));
 								String line = stdoutBuffered.readLine();								
 								
 								if(line.equals("0")){
 									cmd = "ffmpeg -i .sound.wav " + "\'MP3 Files/" + textField.getText() + ".mp3\'";
 									Thread.sleep(200);
-									System.out.println(cmd);
-									builder = new ProcessBuilder("/bin/bash", "-c", cmd);
-									process = builder.start();
+									startProcess(cmd);
 								
-								System.out.println("MP3 created");
-								
-								thisDialog.dispose();
+									thisDialog.dispose();
 								
 								}else{
 									JOptionPane.showMessageDialog(thisDialog, "This name is taken. Please choose another.");
@@ -114,8 +104,7 @@ public class saveAsDialog extends JDialog {
 								
 							} catch (IOException | InterruptedException e1) {
 								e1.printStackTrace();
-							}		
-
+							}
 						}						
 					}
                 });
@@ -134,5 +123,10 @@ public class saveAsDialog extends JDialog {
                 buttonPane.add(cancelButton);
             }
         }
-    }    
+    } 
+        
+    public void startProcess(String cmd) throws IOException{
+    	builder = new ProcessBuilder("/bin/bash", "-c", cmd);
+		process = builder.start();
+    }
 }
