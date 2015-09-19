@@ -8,6 +8,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
+import javax.swing.Timer;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -77,12 +78,12 @@ public class MainFrame extends JFrame {
 		controls.add(progress);
 		progress.setLayout(new BoxLayout(progress, BoxLayout.X_AXIS));
 		
-		JLabel time = new JLabel("0 secs");
-		progress.add(time);
+		final JLabel lblTime = new JLabel("0 secs");
+		progress.add(lblTime);
 		
-		JProgressBar bar = new JProgressBar();
+		final JProgressBar bar = new JProgressBar();
 		progress.add(bar);
-		
+
 		JPanel video_control = new JPanel();
 		controls.add(video_control);
 		video_control.setLayout(new BoxLayout(video_control, BoxLayout.X_AXIS));
@@ -233,6 +234,22 @@ public class MainFrame extends JFrame {
 		this.setVisible(true);
 		
 		video.playMedia("bunny.avi");
+		
+		int length = 0;
+		while(length == 0) {
+			length = (int)((video.getLength())/1000);
+		}
+		
+		bar.setMaximum(length);
+		
+		Timer timer = new Timer(500, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// update the label every second
+				lblTime.setText((video.getTime())/1000+ " secs");
+				bar.setValue((int)(video.getTime())/1000);
+			}
+		});
+		timer.start();
 	}
 
 }
