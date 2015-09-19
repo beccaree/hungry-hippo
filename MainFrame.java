@@ -2,7 +2,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -30,6 +32,7 @@ import javax.swing.JSplitPane;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import javax.swing.SwingConstants;
 
@@ -48,6 +51,9 @@ public class MainFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public MainFrame() {
+		
+		final JFrame thisFrame = this;
+		
 		setTitle("VIDIVOX by twerking-hippo :)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
