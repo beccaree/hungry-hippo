@@ -9,6 +9,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -168,7 +170,14 @@ public class MainFrame extends JFrame {
 		panel_1.add(lblSound);
 		lblSound.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
-		JSlider slider = new JSlider();
+		JSlider slider = new JSlider(); //slider for volume control
+		slider.addChangeListener(new ChangeListener() {
+	        @Override
+	        public void stateChanged(ChangeEvent e) {
+	        	//change the volume of the video to the value value obtained from .getVal
+	            video.setVolume(((JSlider) e.getSource()).getValue()); //havnt checked if this works ------------ Isabel please check <3 --->
+	        }
+	    });
 		panel_1.add(slider);
 		
 		final JButton btnMute = new JButton("Mute");
@@ -192,10 +201,7 @@ public class MainFrame extends JFrame {
 		JPanel audio_editing = new JPanel(); //the right side of the split pane
 		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
 		audio_editing.setMinimumSize(new Dimension(300, 500));
-	
-		JPanel panel_2 = new JPanel();
-		audio_editing.add(panel_2);
-		
+
 		JLabel lblEnterYourCommentary = new JLabel("Commentary here:");
 		lblEnterYourCommentary.setHorizontalAlignment(SwingConstants.LEFT);
 		lblEnterYourCommentary.setAlignmentX(Component.RIGHT_ALIGNMENT);
