@@ -141,7 +141,6 @@ public class StartFrame extends JFrame {
 				if(isVideo){
 					thisFrame.dispose();
 					JFrame main = new MainFrame();
-					main.setVisible(true);
 					System.out.println("goes to main page");
 					
 				}else{
