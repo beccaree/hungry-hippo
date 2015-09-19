@@ -48,7 +48,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainFrame() {
+	public MainFrame(String videoPath) {
 		setTitle("VIDIVOX by twerking-hippo :)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
@@ -187,8 +187,8 @@ public class MainFrame extends JFrame {
 		panel_1.add(btnMute);
 		videoPane.setMinimumSize(new Dimension(300, 500));
 		
-		//Audio editing implementation ---------------------------------------------------->
 		
+		//Audio editing implementation ---------------------------------------------------->
 		JPanel audio_editing = new JPanel(); //the right side of the split pane
 		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
 		audio_editing.setMinimumSize(new Dimension(300, 500));
@@ -276,7 +276,7 @@ public class MainFrame extends JFrame {
 		//video manipulation implementation ------------------------------------------------->
 		this.setVisible(true); //set the frame to visible before playing the video
 		
-		video.playMedia("bunny.avi"); //play the video
+		video.playMedia(videoPath); //play the video
 		
 		video.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
 		    @Override
@@ -297,7 +297,7 @@ public class MainFrame extends JFrame {
 		Timer timer = new Timer(500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				lblTime.setText((video.getTime())/1000+ " secs"); //update the label
-				bar.setValue((int)(video.getTime())/1000); //update the progressbar
+				bar.setValue((int)(video.getTime())/1000); //update the progress bar
 			}
 		});
 		timer.start();
