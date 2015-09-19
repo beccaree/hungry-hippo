@@ -218,8 +218,17 @@ public class MainFrame extends JFrame {
 		btnSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//save input in textarea as .wav file and convert to .mp3 and save
+				
+				String words = txtrCommentary.getText();
+	   			StringTokenizer st = new StringTokenizer(words);
+	   			st.countTokens();
+	   			
+	   			if (st.countTokens() <= 40){				
 				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
 				saveDialog.setVisible(true);
+	   			}else{
+	   				JOptionPane.showMessageDialog(thisFrame, "Numbers of words in commentary exceeds 40. Please try again.");
+	   			}
 			}
 		});
 		audio_options.add(btnSaveAs);
