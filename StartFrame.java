@@ -145,6 +145,7 @@ public class StartFrame extends JFrame {
 					
 				}else{
 					//Navigate to an error dialog
+					JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is a video.");
 					System.out.println("goes to error dialog");
 				}			
 
