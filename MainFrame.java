@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 
 import java.awt.FlowLayout;
 
@@ -43,6 +44,7 @@ public class MainFrame extends JFrame {
 	
 	int festID = 0; //because process ID is very unlikely to be 0
 	static boolean playClicked = false;
+	static boolean muteClicked = false;
 	
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
@@ -99,11 +101,16 @@ public class MainFrame extends JFrame {
 		controls.add(video_control);
 		video_control.setLayout(new BoxLayout(video_control, BoxLayout.X_AXIS));
 		
-		JButton btnSkipBack = new JButton("<<");
-		final JButton btnRewind = new JButton("l <<");
-		final JButton btnPlay = new JButton("ll");
-		final JButton btnForward = new JButton(">> l");
-		JButton btnSkipForward = new JButton(">>");
+		JButton btnSkipBack = new JButton();
+		btnSkipBack.setIcon(new ImageIcon("buttons/skipb.png"));
+		JButton btnRewind = new JButton();
+		btnRewind.setIcon(new ImageIcon("buttons/rewind.png"));
+		final JButton btnPlay = new JButton();
+		btnPlay.setIcon(new ImageIcon("buttons/pause.png"));
+		JButton btnForward = new JButton();
+		btnForward.setIcon(new ImageIcon("buttons/forward.png"));
+		JButton btnSkipForward = new JButton();
+		btnSkipForward.setIcon(new ImageIcon("buttons/skipf.png"));
 		
 		btnSkipBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -117,7 +124,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				//should continue rewinding until user clicks play
 				playClicked = false;
-				btnPlay.setText(">"); //first set button to play
+				btnPlay.setIcon(new ImageIcon("buttons/play.png")); //first set button to play
 				BgForward rewind = new BgForward(-500, video); //make a new background task
 				rewind.execute();
 			}
@@ -127,13 +134,14 @@ public class MainFrame extends JFrame {
 		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//play or pause video
-				if(btnPlay.getText().equals(">")) {
-					btnPlay.setText("ll");
+				if(!playClicked) {
+					btnPlay.setIcon(new ImageIcon("buttons/pause.png"));
 					video.play(); //play the video
 					playClicked = true;
 				} else {
-					btnPlay.setText(">");
+					btnPlay.setIcon(new ImageIcon("buttons/play.png"));
 					video.pause(); //pause the video
+					playClicked = false;
 				}
 			}
 		});
@@ -144,7 +152,7 @@ public class MainFrame extends JFrame {
 				//should continue forwarding until user clicks play
 				playClicked = false;
 				BgForward forward = new BgForward(500, video); //make a new background task
-				btnPlay.setText(">"); //first set button to play
+				btnPlay.setIcon(new ImageIcon("buttons/play.png")); //first set button to play
 				forward.execute();
 			}
 		});
@@ -180,16 +188,19 @@ public class MainFrame extends JFrame {
 	    });
 		panel_1.add(slider);
 		
-		final JButton btnMute = new JButton("Mute");
+		final JButton btnMute = new JButton();
+		btnMute.setIcon(new ImageIcon("buttons/mute.png"));
 		btnMute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//mute the sound when clicked, unmute when clicked again
-				if(btnMute.getText().equals("Mute")) {
-					btnMute.setText("UnMute");
+				if(!muteClicked) {
+					btnMute.setIcon(new ImageIcon("buttons/unmute.png"));
 					video.mute(); //toggles mute for the video
+					muteClicked = true;
 				} else {
-					btnMute.setText("Mute");
+					btnMute.setIcon(new ImageIcon("buttons/mute.png"));
 					video.mute(); //toggles mute for the video
+					muteClicked = false;
 				}
 			}
 		});
