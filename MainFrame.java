@@ -2,15 +2,15 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 
 import java.awt.FlowLayout;
 
@@ -32,7 +33,6 @@ import javax.swing.JSplitPane;
 
 import java.awt.Component;
 import java.io.IOException;
-import java.util.StringTokenizer;
 
 import javax.swing.SwingConstants;
 
@@ -43,6 +43,8 @@ import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 public class MainFrame extends JFrame {
 	
 	int festID = 0; //because process ID is very unlikely to be 0
+	static boolean playClicked = true;
+	static boolean muteClicked = false;
 	
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
@@ -50,10 +52,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainFrame() {
-		
-		final JFrame thisFrame = this;
-		
+	public MainFrame(String videoPath) {
 		setTitle("VIDIVOX by twerking-hippo :)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
@@ -102,36 +101,70 @@ public class MainFrame extends JFrame {
 		controls.add(video_control);
 		video_control.setLayout(new BoxLayout(video_control, BoxLayout.X_AXIS));
 		
-		JButton btnReverse = new JButton("l <<");
-		btnReverse.addActionListener(new ActionListener() {
+		JButton btnSkipBack = new JButton();
+		btnSkipBack.setIcon(new ImageIcon("buttons/skipb.png"));
+		JButton btnRewind = new JButton();
+		btnRewind.setIcon(new ImageIcon("buttons/rewind.png"));
+		final JButton btnPlay = new JButton();
+		btnPlay.setIcon(new ImageIcon("buttons/pause.png"));
+		JButton btnForward = new JButton();
+		btnForward.setIcon(new ImageIcon("buttons/forward.png"));
+		JButton btnSkipForward = new JButton();
+		btnSkipForward.setIcon(new ImageIcon("buttons/skipf.png"));
+		
+		btnSkipBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//should continue rewinding until user clicks play
+				//skips backward 5 seconds every time it is clicked
+				video.skip(-5000);
 			}
 		});
-		video_control.add(btnReverse);
+		video_control.add(btnSkipBack);
 		
-		final JButton btnPlay = new JButton("ll");
+		btnRewind.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//should continue rewinding until user clicks play
+				playClicked = false;
+				btnPlay.setIcon(new ImageIcon("buttons/play.png")); //first set button to play
+				BgForward rewind = new BgForward(-500, video); //make a new background task
+				rewind.execute();
+			}
+		});
+		video_control.add(btnRewind);
+		
 		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//play or pause video
-				if(btnPlay.getText().equals(">")) {
-					btnPlay.setText("ll");
+				if(!playClicked) {
+					btnPlay.setIcon(new ImageIcon("buttons/pause.png"));
 					video.play(); //play the video
+					playClicked = true;
 				} else {
-					btnPlay.setText(">");
+					btnPlay.setIcon(new ImageIcon("buttons/play.png"));
 					video.pause(); //pause the video
+					playClicked = false;
 				}
 			}
 		});
 		video_control.add(btnPlay);
-		
-		JButton btnForward = new JButton(">> l");
+
 		btnForward.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//should continue forwarding until user clicks play
+				playClicked = false;
+				BgForward forward = new BgForward(500, video); //make a new background task
+				btnPlay.setIcon(new ImageIcon("buttons/play.png")); //first set button to play
+				forward.execute();
 			}
 		});
 		video_control.add(btnForward);
+		
+		btnSkipForward.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//skips forward 5 seconds every time it is clicked
+				video.skip(5000);
+			}
+		});
+		video_control.add(btnSkipForward);
 		
 		JPanel volume_control = new JPanel(); //panel for holding the volume control buttons (jslider and mute btn)
 		controls.add(volume_control);
@@ -145,34 +178,41 @@ public class MainFrame extends JFrame {
 		panel_1.add(lblSound);
 		lblSound.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
-		JSlider slider = new JSlider();
+		JSlider slider = new JSlider(); //slider for volume control
+		slider.addChangeListener(new ChangeListener() {
+	        @Override
+	        public void stateChanged(ChangeEvent e) {
+	        	//change the volume of the video to the value value obtained from .getVal
+	            video.setVolume(((JSlider) e.getSource()).getValue()); //havnt checked if this works ------------ Isabel please check <3 --->
+	        }
+	    });
 		panel_1.add(slider);
 		
-		final JButton btnMute = new JButton("Mute");
+		final JButton btnMute = new JButton();
+		btnMute.setIcon(new ImageIcon("buttons/mute.png"));
 		btnMute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//mute the sound when clicked, unmute when clicked again
-				if(btnMute.getText().equals("Mute")) {
-					btnMute.setText("UnMute");
+				if(!muteClicked) {
+					btnMute.setIcon(new ImageIcon("buttons/unmute.png"));
 					video.mute(); //toggles mute for the video
+					muteClicked = true;
 				} else {
-					btnMute.setText("Mute");
+					btnMute.setIcon(new ImageIcon("buttons/mute.png"));
 					video.mute(); //toggles mute for the video
+					muteClicked = false;
 				}
 			}
 		});
 		panel_1.add(btnMute);
 		videoPane.setMinimumSize(new Dimension(300, 500));
 		
-		//Audio editing implementation ---------------------------------------------------->
 		
+		//Audio editing implementation ---------------------------------------------------->
 		JPanel audio_editing = new JPanel(); //the right side of the split pane
 		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
 		audio_editing.setMinimumSize(new Dimension(300, 500));
-	
-		JPanel panel_2 = new JPanel();
-		audio_editing.add(panel_2);
-		
+
 		JLabel lblEnterYourCommentary = new JLabel("Commentary here:");
 		lblEnterYourCommentary.setHorizontalAlignment(SwingConstants.LEFT);
 		lblEnterYourCommentary.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -224,17 +264,6 @@ public class MainFrame extends JFrame {
 		btnSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//save input in textarea as .wav file and convert to .mp3 and save
-				
-				String words = txtrCommentary.getText();
-	   			StringTokenizer st = new StringTokenizer(words);
-	   			st.countTokens();
-	   			
-	   			if (st.countTokens() <= 40){				
-				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
-				saveDialog.setVisible(true);
-	   			}else{
-	   				JOptionPane.showMessageDialog(thisFrame, "Numbers of words in commentary exceeds 40. Please try again.");
-	   			}
 			}
 		});
 		audio_options.add(btnSaveAs);
@@ -264,13 +293,14 @@ public class MainFrame extends JFrame {
 		//video manipulation implementation ------------------------------------------------->
 		this.setVisible(true); //set the frame to visible before playing the video
 		
-		video.playMedia("bunny.avi"); //play the video
+		video.playMedia(videoPath); //play the video
 		
 		video.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
 		    @Override
 		    public void finished(MediaPlayer mediaPlayer) {
 		        //button to play when media player finished playing...
-		    	btnPlay.setText(">");
+		    	playClicked = false;
+		    	btnPlay.setIcon(new ImageIcon("buttons/play.png"));
 		    }
 		});
 		
@@ -281,11 +311,11 @@ public class MainFrame extends JFrame {
 		
 		bar.setMaximum(length);
 		
+		//timer for updating the label and progress bar every second
 		Timer timer = new Timer(500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// update the label every second
-				lblTime.setText((video.getTime())/1000+ " secs");
-				bar.setValue((int)(video.getTime())/1000);
+				lblTime.setText((video.getTime())/1000+ " secs"); //update the label
+				bar.setValue((int)(video.getTime())/1000); //update the progress bar
 			}
 		});
 		timer.start();
@@ -298,7 +328,7 @@ public class MainFrame extends JFrame {
             {
             	e.getWindow().dispose();
             	//if the video is muted, unmuted before exiting the program
-            	if(btnMute.getText() == "UnMute") {
+            	if(muteClicked) {
 		    		video.mute();
 		    	}
             }
