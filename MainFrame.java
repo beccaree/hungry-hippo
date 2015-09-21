@@ -285,6 +285,7 @@ public class MainFrame extends JFrame {
 		//Adding the two different panels to the two sided of the split pane ---------------->
 		JSplitPane splitPane = new JSplitPane();
 		setContentPane(splitPane);
+		splitPane.setResizeWeight(0.8);
 		splitPane.setLeftComponent(videoPane);
 		splitPane.setRightComponent(audio_editing);
 		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
@@ -294,6 +295,7 @@ public class MainFrame extends JFrame {
 		this.setVisible(true); //set the frame to visible before playing the video
 		
 		video.playMedia(videoPath); //play the video
+		video.setVolume(50); //set initial volume to 50 (same as JSlider)
 		
 		video.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
 		    @Override
