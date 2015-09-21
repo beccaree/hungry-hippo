@@ -2,7 +2,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -11,6 +13,7 @@ import javax.swing.JProgressBar;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -56,7 +59,7 @@ public class MainFrame extends JFrame {
 		setTitle("VIDIVOX by twerking-hippo :)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
-		
+		final JFrame thisFrame = this;
 		
 		//Top menu bar implementation -------------------------------------------------->
 		JMenuBar menuBar = new JMenuBar();
@@ -69,6 +72,22 @@ public class MainFrame extends JFrame {
 		mntmOpenNewVideo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//changing the video that we are editing
+				//promt user for the video
+				String newPath;
+				JFileChooser videoChooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
+				videoChooser.setFileFilter(filter);
+				int okReturnVal = videoChooser.showOpenDialog(getParent());
+				if(okReturnVal == JFileChooser.APPROVE_OPTION) {
+					newPath = videoChooser.getSelectedFile().getPath();
+					//check if file chosen is a video, if yes, change video, if not, error dialog and do nothing
+					if(File.isVideo(newPath)) {
+						video.playMedia(newPath);
+					} else {
+						JOptionPane.showMessageDialog(thisFrame, "The file you have chosen is not a video, please try again.");
+					}
+				}
+				
 			}
 		});
 		mnFile.add(mntmOpenNewVideo);
