@@ -94,7 +94,6 @@ public class saveAsDialog extends JDialog {
         				// Generate an .mp3 file if none already exists
         				if(line.equals("0")) {
 							cmd = "ffmpeg -i sound.wav " + "\'MP3Files/" + textField.getText() + ".mp3\'";
-        					Thread.sleep(200); //REBECCA :O ~ do we need this?-------- is it important, just wondering 
         					startProcess(cmd);
 									
         					JOptionPane.showMessageDialog(thisDialog, "Successfully saved "+ textField.getText() +".mp3");								
@@ -105,7 +104,7 @@ public class saveAsDialog extends JDialog {
         					JOptionPane.showMessageDialog(thisDialog, "This name is taken. Please choose another.");
         				}
 								
-        			} catch (IOException | InterruptedException e1) {
+        			} catch (IOException e1) {
         				e1.printStackTrace();
         			}
         		}
