@@ -258,17 +258,14 @@ public class MainFrame extends JFrame {
 		JPanel audio_options = new JPanel();
 		audio_editing.add(audio_options);
 		
+		// Speak commentary to the user through festival text-to-speech
 		JButton btnSpeak = new JButton("Speak");
 		btnSpeak.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//use festival to speak out what the user has inputed in text area
-					
-				//execute background process of festival
 				String input = txtrCommentary.getText();
 				BgFestival bg = new BgFestival(input, killPID);
 				bg.execute();
 				killPID.removeAll(killPID);
-				System.out.println("Be 0:"+killPID.size());
 			}
 		});
 		audio_options.add(btnSpeak);
@@ -276,18 +273,15 @@ public class MainFrame extends JFrame {
 		JButton btnStop = new JButton("Stop");
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//kill the process --------------------------------------------------------
-				System.out.println("Be 1:"+killPID.size());
+				// Kill the festival process (Stop speaking) --------------------------------------------------------
 				if (!killPID.isEmpty()) {
 					if (killPID.get(0) != 0) {
 						festID = killPID.get(0)+4;
-						System.out.println(festID);
 						String cmd = "kill " + (festID);
 						ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 						try {
 							builder.start();
 							killPID.set(0, 0);
-							System.out.println(killPID.get(0));
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
@@ -297,21 +291,22 @@ public class MainFrame extends JFrame {
 		});
 		audio_options.add(btnStop);
 		
+		// Save input in text area as .wav file and convert it to an .mp3
 		JButton btnSaveAs = new JButton("Save as MP3");
 		btnSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//save input in textarea as .wav file and convert to .mp3 and save
+				
+				// Check that the number of words in the commentary is greater than 0 but no more than 40
 				String words = txtrCommentary.getText();
 	   			StringTokenizer st = new StringTokenizer(words);
 	   			st.countTokens();
 	   			
-	   			if (st.countTokens() <= 40 || st.countTokens() == 0) { //check that the number of words is more than 0 but less than 40		
+	   			if (st.countTokens() > 0 || st.countTokens() <= 40) { 		
 	   				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
 	   				saveDialog.setVisible(true);
 	   			} else {
-	   				JOptionPane.showMessageDialog(thisFrame, "Numbers of words in commentary exceeds 40. Please try again.");
+	   				JOptionPane.showMessageDialog(thisFrame, "Enter between 1 and 40 words. Please try again.");
 	   			}
-
 			}
 		});
 		audio_options.add(btnSaveAs);
@@ -320,14 +315,14 @@ public class MainFrame extends JFrame {
 		audio_editing.add(panel);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
+		// Let user select an .mp3 file to merge with current video
 		JButton btnMerge = new JButton("Merge With MP3");
 		btnMerge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//merge mp3 with current video 
-				//prompt user to choose mp3 file to merge with
+
 				String mp3Path = null;
 				
-				//select mp3
+				// Let user select an mp3
 				JFileChooser mp3Chooser = new JFileChooser();
 			    FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 File", "mp3");
 			    mp3Chooser.setFileFilter(filter);
@@ -336,21 +331,19 @@ public class MainFrame extends JFrame {
 			    	mp3Path = mp3Chooser.getSelectedFile().getPath();
 
 			    	if(File.isMp3(mp3Path)){
-			    		//merge mp3 with current video 
-			    		String videoPath = "bunny.avi";
+			    		
+			    		String videoPath = "bunny.avi"; // ***SOMETHING with changing to either USER SELECTED or BUNNY AVI***
 			    		File.mergeMp3(mp3Path, videoPath);
+						//int n = JOptionPane.showConfirmDialog((Component) null, "Successfully Merged "+ mp3Path +" with "+ videoPath+".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
+			    		int n = JOptionPane.showConfirmDialog((Component) null, "Successfully merged "+ File.getBasename(mp3Path) +" with "+ File.getBasename(videoPath) +".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
 			    		
-			    		int n = JOptionPane.showConfirmDialog((Component) null, "Successfully Merged "+ mp3Path +" with "+ videoPath+".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
-			    		
-			    		if(n == 0) { //user clicked ok
-			    			//change the video to output.avi
-			    			video.playMedia("output.avi");
+			    		if(n == 0) { // Change the video to output.avi if user selects "OK"
+		    				video.playMedia("output.avi");
 			    		}
 			    		
 			    	} else {
 			    		//Navigate to an error dialog
-			    		JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio (.MP3).");
-			    		System.out.println("goes to error dialog");
+			    		JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio file (.mp3).");
 			    	}
 			    }
 			}
@@ -417,3 +410,4 @@ public class MainFrame extends JFrame {
         });
 	}
 }
+
