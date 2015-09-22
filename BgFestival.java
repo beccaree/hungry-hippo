@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.SwingWorker;
 
 /**
- * @author Isabel Zhaung and Rebecca Lee
+ * @author Isabel Zhuang and Rebecca Lee
  * Class executes festival text-to-speech from commentary entered by the user
  */
 public class BgFestival extends SwingWorker<Void, Void> {
@@ -40,9 +40,9 @@ public class BgFestival extends SwingWorker<Void, Void> {
 			String line = stdoutbr.readLine();
 			festID = Integer.parseInt(line); // Stores ID for canceling(Stop)
 
-			System.out.println("Be 0:" + killPID.size());
+			//System.out.println("Be 0:" + killPID.size()); // For debugging use
 			killPID.add(festID);
-			System.out.println("Be 1:" + killPID.size());
+			//System.out.println("Be 1:" + killPID.size());
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
