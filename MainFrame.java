@@ -336,38 +336,17 @@ public class MainFrame extends JFrame {
 			    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
 			    	mp3Path = mp3Chooser.getSelectedFile().getPath();
 			    	System.out.println(mp3Path);
+			    	if(File.isMp3(mp3Path)){
+			    		//merge mp3 with current video 
+			    		String videoPath = "bunny.avi";
+			    		File.mergeMp3(mp3Path, videoPath);
+					
+			    	} else {
+			    		//Navigate to an error dialog
+			    		JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio (.MP3).");
+			    		System.out.println("goes to error dialog");
+			    	}
 			    }
-
-				if(File.isMp3(mp3Path)){
-					//merge mp3 with current video 
-					String videoPath = "bunny.avi";
-					try {
-						String cmd = "ffmpeg -i " + videoPath + " -map 0:1 vidAudio.mp3";
-						startProcess(cmd);
-						
-						cmd = "rm -r output.mp3";
-						startProcess(cmd);
-						
-						cmd = "ffmpeg -i " + mp3Path + " -i vidAudio.mp3 -filter_complex amix=inputs=2 output.mp3";
-						startProcess(cmd);
-						
-						cmd = "rm -r output.avi";
-						startProcess(cmd);
-						
-						cmd = "ffmpeg -i output.mp3 -i " + videoPath + " -map 0:0 -map 1:0 -acodec copy -vcodec copy output.avi";
-						startProcess(cmd);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}					
-					
-					System.out.println("merged video: make sure to play merged video, hide video called .output.avi, when done testing");
-					
-				}else{
-					//Navigate to an error dialog
-					JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio (.MP3).");
-					System.out.println("goes to error dialog");
-				}
-
 			}
 		});
 		panel.add(btnMerge);
@@ -430,10 +409,5 @@ public class MainFrame extends JFrame {
 		    	}
             }
         });
-	}
-	
-	public void startProcess(String cmd) throws IOException{
-		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
-		builder.start();
 	}
 }
