@@ -372,7 +372,7 @@ public class MainFrame extends JFrame {
 						e1.printStackTrace();
 					}					
 					
-					System.out.println("merged video: make sure to play merged video, hidden video called .output.avi");
+					System.out.println("merged video: make sure to play merged video, hide video called .output.avi, when done testing");
 					
 				}else{
 					//Navigate to an error dialog
