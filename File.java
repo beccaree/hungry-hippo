@@ -86,6 +86,8 @@ public class File {
 			cmd = "rm -r output.mp3";
 			startProcess(cmd);
 			
+			Thread.sleep(200); // Stops thread from continuing(sleep) so previous command can finish executing
+			
 			// Creates an mp3 file output.mp3 that combines the video audio and selected mp3 audio for merging 
 			cmd = "ffmpeg -i " + mp3Path + " -i vidAudio.mp3 -filter_complex amix=inputs=2 output.mp3";
 			startProcess(cmd);
