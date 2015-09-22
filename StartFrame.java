@@ -27,7 +27,10 @@ import java.io.InputStreamReader;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 
-
+/**
+ * @author Isabel Zhuang and Rebecca Lee
+ * Class contains implementation and graphical user interface code for the starting frame.
+ */
 public class StartFrame extends JFrame {
 
 	private JPanel contentPane;
@@ -76,22 +79,23 @@ public class StartFrame extends JFrame {
 		panel.add(panel_1);
 		
 		txtVideoPath = new JTextField();
-		txtVideoPath.setText("/HOME/Documents/Videos/...");
+		txtVideoPath.setText("/HOME/");
 		panel_1.add(txtVideoPath);
 		txtVideoPath.setColumns(30);
 		
 		JButton btnBrowse = new JButton("Browse");
 		btnBrowse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				 
+				
+				// Allows user to choose their own video file to play
 				JFileChooser videoChooser = new JFileChooser();
-				    FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
-				    videoChooser.setFileFilter(filter);
-				    int okReturnVal = videoChooser.showOpenDialog(getParent());
-				    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
-				    	videoPath = videoChooser.getSelectedFile().getPath();
-				    	txtVideoPath.setText(videoPath);
-				    }
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
+				videoChooser.setFileFilter(filter);
+				int okReturnVal = videoChooser.showOpenDialog(getParent());
+				if(okReturnVal == JFileChooser.APPROVE_OPTION) {
+					videoPath = videoChooser.getSelectedFile().getPath();
+				  	txtVideoPath.setText(videoPath);
+				}
 			}
 		});
 		panel_1.add(btnBrowse);
@@ -99,7 +103,7 @@ public class StartFrame extends JFrame {
 		JPanel panel_2 = new JPanel();
 		panel.add(panel_2);
 		
-		final JCheckBox chckbxDefaultVid = new JCheckBox("Use Bunny Video"); //isSelected() returns boolean, true if on and false if off
+		final JCheckBox chckbxDefaultVid = new JCheckBox("Use Bunny Video"); // Tick if user wants to use the big buck bunny video
 		panel_2.add(chckbxDefaultVid);
 		
 		JPanel panel_3 = new JPanel();
@@ -112,35 +116,15 @@ public class StartFrame extends JFrame {
 		JButton btnNewButton = new JButton("Ok");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				String cmd = "file "+ videoPath;
-				
-				//Determine if file chosen is a video file
-				ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", cmd);
-				Process process;
-				try {
-					process = processBuilder.start();
-					InputStream output = process.getInputStream();
-					BufferedReader stdout = new BufferedReader(new InputStreamReader(output));
 
-					String line = null;
-					while ((line = stdout.readLine()) != null) {
-						if (line.matches("(.*)video: FFMpeg MPEG-4(.*)")){
-							isVideo = true;
-						}
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-
-				if(chckbxDefaultVid.isSelected()) { //if the user chooses to use the bunny video
+				if(chckbxDefaultVid.isSelected()) { // If the user chooses to use the bunny video
 					thisFrame.dispose();
 					new MainFrame("bunny.avi");
-				} else if(isVideo){ //if the user has chosen a video for themselves
+				} else if(File.isVideo(videoPath)) { // If the user has chosen a video
 					thisFrame.dispose();
 					new MainFrame(videoPath);	
-				} else { //if the user has not chosen a video
-					//Navigate to an error dialog
+				} else { // If the user has not chosen a video
+					// Display an error dialog
 					JOptionPane.showMessageDialog(thisFrame, "The file you have chosen is not a video, please try again.");
 				}			
 
