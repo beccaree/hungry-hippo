@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,28 +76,33 @@ public class saveAsDialog extends JDialog {
 				   		
 							try {
 
-								textPath = System.getProperty("user.dir")+ "/.commentary.txt";
+								textPath = System.getProperty("user.dir")+ "/.commentary.txt"; // Generate a hidden .txt file containing user commentary
 								BufferedWriter bw = new BufferedWriter(new FileWriter(textPath, false));
 								bw.write(commentary);
 								bw.close();
-
+								
+								// Generate a sound.wav file from the saved user commentary
 								cmd = "text2wave " + textPath + " -o sound.wav";
 								startProcess(cmd);		
 								
+								// Find out if any .mp3 file in MP3Files folder has the same name user has entered for MP3 file name
 								cmd = "find | grep -x \"./MP3Files/" + textField.getText() +".mp3\" | wc -l";
 								startProcess(cmd);
 								
 								builder.redirectErrorStream(true);
 								InputStream stdout = process.getInputStream();
 								BufferedReader stdoutBuffered =	new BufferedReader(new InputStreamReader(stdout));
+								
 								String line = stdoutBuffered.readLine();								
 								
+								// Generate an .mp3 file if none already exists
 								if(line.equals("0")){
+									
 									cmd = "ffmpeg -i sound.wav " + "\'MP3Files/" + textField.getText() + ".mp3\'";
-									Thread.sleep(200);
+									Thread.sleep(200); //REBECCA :O ~ do we need this?-------- is it important, just wondering 
 									startProcess(cmd);
-									JOptionPane.showMessageDialog(thisDialog, "Successfully saved "+textField.getText() +".mp3");
-								
+									
+									JOptionPane.showMessageDialog(thisDialog, "Successfully saved "+ textField.getText() +".mp3");								
 									thisDialog.dispose();
 								
 								} else {
@@ -131,3 +137,4 @@ public class saveAsDialog extends JDialog {
 		process = builder.start();
     }
 }
+
