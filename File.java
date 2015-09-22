@@ -60,7 +60,7 @@ public class File {
 
 			String line = null;
 			while ((line = stdout.readLine()) != null) {
-				if (line.matches("(.*): Audio file(.*)")){
+				if (line.matches("(.*): Audio file(.*)")){ // Matches audio format
 					return true;
 				}
 			}
