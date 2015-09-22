@@ -334,12 +334,19 @@ public class MainFrame extends JFrame {
 			    int okReturnVal = mp3Chooser.showOpenDialog(getParent());
 			    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
 			    	mp3Path = mp3Chooser.getSelectedFile().getPath();
-			    	System.out.println(mp3Path);
+
 			    	if(File.isMp3(mp3Path)){
 			    		//merge mp3 with current video 
 			    		String videoPath = "bunny.avi";
 			    		File.mergeMp3(mp3Path, videoPath);
-					
+			    		
+			    		int n = JOptionPane.showConfirmDialog((Component) null, "Successfully Merged "+ mp3Path +" with "+ videoPath+".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
+			    		
+			    		if(n == 0) { //user clicked ok
+			    			//change the video to output.avi
+			    			video.playMedia("output.avi");
+			    		}
+			    		
 			    	} else {
 			    		//Navigate to an error dialog
 			    		JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio (.MP3).");
