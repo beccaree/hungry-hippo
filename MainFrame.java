@@ -54,6 +54,7 @@ public class MainFrame extends JFrame {
 	int festID = 0; //because process ID is very unlikely to be 0
 	static boolean playClicked = true;
 	static boolean muteClicked = false;
+	static boolean stopForward = false;
 	private ArrayList<Integer> killPID = new ArrayList<Integer>();
 	
 	private final EmbeddedMediaPlayerComponent component;
@@ -166,6 +167,7 @@ public class MainFrame extends JFrame {
 					btnPlay.setIcon(new ImageIcon("buttons/pause.png"));
 					video.play(); //play the video
 					playClicked = true;
+					stopForward = false;
 				} else {
 					btnPlay.setIcon(new ImageIcon("buttons/play.png"));
 					video.pause(); //pause the video
@@ -202,7 +204,7 @@ public class MainFrame extends JFrame {
 		volume_control.add(panel_1, BorderLayout.SOUTH);
 		panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JLabel lblSound = new JLabel("Sound");
+		JLabel lblSound = new JLabel("Volume");
 		panel_1.add(lblSound);
 		lblSound.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
@@ -211,7 +213,7 @@ public class MainFrame extends JFrame {
 	        @Override
 	        public void stateChanged(ChangeEvent e) {
 	        	//change the volume of the video to the value value obtained from .getVal
-	            video.setVolume(((JSlider) e.getSource()).getValue()); //havnt checked if this works ------------ Isabel please check <3 --->
+	            video.setVolume(((JSlider) e.getSource()).getValue());
 	        }
 	    });
 		panel_1.add(slider);
@@ -336,7 +338,7 @@ public class MainFrame extends JFrame {
 			    	System.out.println(mp3Path);
 			    }
 
-				if(/*File.isMp3(mp3Path)*/true){
+				if(File.isMp3(mp3Path)){
 					//merge mp3 with current video 
 					String videoPath = "bunny.avi";
 					try {
@@ -375,7 +377,7 @@ public class MainFrame extends JFrame {
 		//Adding the two different panels to the two sided of the split pane ---------------->
 		JSplitPane splitPane = new JSplitPane();
 		setContentPane(splitPane);
-		splitPane.setResizeWeight(0.8);
+		splitPane.setResizeWeight(0.8); //resizes the frames in a 8:2 ratio
 		splitPane.setLeftComponent(videoPane);
 		splitPane.setRightComponent(audio_editing);
 		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
@@ -393,21 +395,26 @@ public class MainFrame extends JFrame {
 		        //button to play when media player finished playing...
 		    	playClicked = false;
 		    	btnPlay.setIcon(new ImageIcon("buttons/play.png"));
+		    	stopForward = true;
 		    }
 		});
 		
-		int length = 0;
-		while(length == 0) {
-			length = (int)((video.getLength())/1000);
+		final int[] vidLength = {0}; //initailise as array so final value can be changed
+		while(vidLength[0] == 0) {
+			vidLength[0] = (int)((video.getLength())/1000);
 		}
 		
-		bar.setMaximum(length);
+		bar.setMaximum(vidLength[0]);
 		
 		//timer for updating the label and progress bar every second
 		Timer timer = new Timer(500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				lblTime.setText((video.getTime())/1000+ " secs"); //update the label
 				bar.setValue((int)(video.getTime())/1000); //update the progress bar
+				if(video.getLength() == 0) {
+					//if video gets to the beginning or video get to the end, stop the rewinding and fast forwarding
+					stopForward = true;
+				}
 			}
 		});
 		timer.start();
@@ -428,6 +435,6 @@ public class MainFrame extends JFrame {
 	}
 	public void startProcess(String cmd) throws IOException{
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
-		Process process = builder.start();
+		builder.start();
 	}
 }
