@@ -254,8 +254,10 @@ public class MainFrame extends JFrame {
 					
 				//execute background process of festival
 				String input = txtrCommentary.getText();
-				BgFestival bg = new BgFestival(input);
+				BgFestival bg = new BgFestival(input, killPID);
 				bg.execute();
+				killPID.removeAll(killPID);
+				System.out.println("Be 0:"+killPID.size());
 			}
 		});
 		audio_options.add(btnSpeak);
@@ -263,16 +265,21 @@ public class MainFrame extends JFrame {
 		JButton btnStop = new JButton("Stop");
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//kill the process --------------------------------------------------------not working yet
-				if(festID != 0) {
-					String cmd = "kill "+(festID+4);
-					ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
-					try {
-						builder.start();
-						festID = 0;
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+				//kill the process --------------------------------------------------------
+				System.out.println("Be 1:"+killPID.size());
+				if (!killPID.isEmpty()) {
+					if (killPID.get(0) != 0) {
+						festID = killPID.get(0)+4;
+						System.out.println(festID);
+						String cmd = "kill " + (festID);
+						ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
+						try {
+							builder.start();
+							killPID.set(0, 0);
+							System.out.println(killPID.get(0));
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 					}
 				}
 			}
@@ -283,6 +290,18 @@ public class MainFrame extends JFrame {
 		btnSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//save input in textarea as .wav file and convert to .mp3 and save
+				String words = txtrCommentary.getText();
+	   			StringTokenizer st = new StringTokenizer(words);
+	   			st.countTokens();
+	   			
+	   			if (st.countTokens() <= 40){				
+				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
+				saveDialog.setVisible(true);
+	   			}else{
+	   				JOptionPane.showMessageDialog(thisFrame, "Numbers of words in commentary exceeds 40. Please try again.");
+	   			}
+				
+				
 			}
 		});
 		audio_options.add(btnSaveAs);
@@ -296,6 +315,72 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				//merge mp3 with current video 
 				//prompt user to choose mp3 file to merge with
+				String mp3Path = null;
+				
+				//select mp3
+				JFileChooser mp3Chooser = new JFileChooser();
+			    FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 File", "mp3");
+			    mp3Chooser.setFileFilter(filter);
+			    int okReturnVal = mp3Chooser.showOpenDialog(getParent());
+			    if(okReturnVal == JFileChooser.APPROVE_OPTION) {
+			    	mp3Path = mp3Chooser.getSelectedFile().getPath();
+			    	System.out.println(mp3Path);
+			    }
+			    
+			    //Determine whether it is an mp3 file
+			    String cmd = "file "+ mp3Path;
+			    boolean ismp3 = false;
+				
+				//Determine if file chosen is a video file
+				ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", cmd);
+				Process process;
+				try {
+					process = processBuilder.start();
+					InputStream output = process.getInputStream();
+					BufferedReader stdout = new BufferedReader(new InputStreamReader(output));
+
+					String line = null;
+					while ((line = stdout.readLine()) != null) {
+						if (line.matches("(.*): Audio file(.*)")){
+							ismp3 = true;
+						}
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+
+				if(ismp3){
+					//merge mp3 with current video 
+					String videoPath = "bunny.avi";
+					try {
+						cmd = "ffmpeg -i " + videoPath + " -map 0:1 vidAudio.mp3";
+						startProcess(cmd);
+						
+						cmd = "rm -r output.mp3";
+						startProcess(cmd);
+						
+						cmd = "ffmpeg -i " + mp3Path + " -i vidAudio.mp3 -filter_complex amix=inputs=2 output.mp3";
+						startProcess(cmd);
+						
+						cmd = "rm -r output.avi";
+						startProcess(cmd);
+						
+						cmd = "ffmpeg -i output.mp3 -i " + videoPath + " -map 0:0 -map 1:0 -acodec copy -vcodec copy output.avi";
+						startProcess(cmd);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}					
+					
+					System.out.println("merged video: make sure to play merged video, hidden video called .output.avi");
+					
+				}else{
+					//Navigate to an error dialog
+					JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is a video.");
+					System.out.println("goes to error dialog");
+				}
+				
+				
 			}
 		});
 		panel.add(btnMerge);
@@ -355,5 +440,8 @@ public class MainFrame extends JFrame {
             }
         });
 	}
-
+	public void startProcess(String cmd) throws IOException{
+		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
+		Process process = builder.start();
+	}
 }
