@@ -49,6 +49,10 @@ import uk.co.caprica.vlcj.player.MediaPlayer; //getTime(), skip(), mute(), pause
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent; 
 
+/**
+ * @author Isabel Zhuang and Rebecca Lee
+ * Class contains implementation and graphical user interface code for the main frame.
+ */
 public class MainFrame extends JFrame {
 	
 	int festID = 0; //because process ID is very unlikely to be 0
@@ -59,19 +63,17 @@ public class MainFrame extends JFrame {
 	
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
-	private String videoPath;
 	
 	/**
 	 * Create the frame.
 	 */
 	public MainFrame(String videoPath) {
-		this.videoPath = videoPath;
 		setTitle("VIDIVOX by twerking-hippo :)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
 		final JFrame thisFrame = this;
 		
-		//Top menu bar implementation -------------------------------------------------->
+		// Top menu bar implementation -------------------------------------------------->
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
@@ -81,8 +83,8 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmOpenNewVideo = new JMenuItem("Open New Video...");
 		mntmOpenNewVideo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//changing the video that we are editing
-				//prompt user for the video
+				// Changing the video that we are editing
+				// Prompt user for the video they want to change to
 				String newPath;
 				JFileChooser videoChooser = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
@@ -90,7 +92,7 @@ public class MainFrame extends JFrame {
 				int okReturnVal = videoChooser.showOpenDialog(getParent());
 				if(okReturnVal == JFileChooser.APPROVE_OPTION) {
 					newPath = videoChooser.getSelectedFile().getPath();
-					//check if file chosen is a video, if yes, change video, if not, error dialog and do nothing
+					// Check if file chosen is a video, if yes, change video, if not, show error dialog and do nothing
 					if(File.isVideo(newPath)) {
 						video.playMedia(newPath);
 					} else {
@@ -103,33 +105,34 @@ public class MainFrame extends JFrame {
 		mnFile.add(mntmOpenNewVideo);
 		
 		
-		//Video player implementation -------------------------------------------------->
-		JPanel videoPane = new JPanel(); //left side of the split pane
+		// Video player implementation -------------------------------------------------->
+		JPanel videoPane = new JPanel(); // Left side of the split pane
         videoPane.setLayout(new BorderLayout());
         
-        //add a media component
+        // Add a media component
         component = new EmbeddedMediaPlayerComponent();
         videoPane.add(component, BorderLayout.CENTER);
         video = component.getMediaPlayer();
 		
-		JPanel controls = new JPanel();
+		JPanel controls = new JPanel(); // Holds everything under the video player
 		videoPane.add(controls, BorderLayout.SOUTH);
 		controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
 		
-		JPanel progress = new JPanel();
+		JPanel progress = new JPanel(); // Holds the time in seconds and the progress bar (in controls Panel)
 		controls.add(progress);
 		progress.setLayout(new BoxLayout(progress, BoxLayout.X_AXIS));
 		
-		final JLabel lblTime = new JLabel("0 secs"); //time label for the GUI
+		final JLabel lblTime = new JLabel("0 s"); // Shows the time in seconds since the start of video (GUI)
 		progress.add(lblTime);
 		
-		final JProgressBar bar = new JProgressBar(); //progress bar of the GUI
+		final JProgressBar bar = new JProgressBar(); // Shows the progress of the video (GUI)
 		progress.add(bar);
 
-		JPanel video_control = new JPanel(); //panel for holding all the control buttons (play/pause, rewind, forward)
+		JPanel video_control = new JPanel(); // Holds all the video control buttons (in controls Panel)
 		controls.add(video_control);
 		video_control.setLayout(new BoxLayout(video_control, BoxLayout.X_AXIS));
 		
+		// Initialize all the buttons in video_control Panel
 		JButton btnSkipBack = new JButton();
 		btnSkipBack.setIcon(new ImageIcon("buttons/skipb.png"));
 		JButton btnRewind = new JButton();
@@ -143,7 +146,7 @@ public class MainFrame extends JFrame {
 		
 		btnSkipBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//skips backward 5 seconds every time it is clicked
+				// Skips backward 5 seconds every time it is clicked
 				video.skip(-5000);
 			}
 		});
@@ -151,10 +154,10 @@ public class MainFrame extends JFrame {
 		
 		btnRewind.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//should continue rewinding until user clicks play
+				// Continues rewinding until user clicks play
 				playClicked = false;
-				btnPlay.setIcon(new ImageIcon("buttons/play.png")); //first set button to play
-				BgForward rewind = new BgForward(-500, video); //make a new background task
+				btnPlay.setIcon(new ImageIcon("buttons/play.png")); // Set button to play
+				BgForward rewind = new BgForward(-500, video); // Make a new background task
 				rewind.execute();
 			}
 		});
@@ -162,15 +165,15 @@ public class MainFrame extends JFrame {
 		
 		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//play or pause video
+				// Play or pause video depending on boolean variable playClicked
 				if(!playClicked) {
 					btnPlay.setIcon(new ImageIcon("buttons/pause.png"));
-					video.play(); //play the video
+					video.play(); // Play the video
 					playClicked = true;
 					stopForward = false;
 				} else {
 					btnPlay.setIcon(new ImageIcon("buttons/play.png"));
-					video.pause(); //pause the video
+					video.pause(); // Pause the video
 					playClicked = false;
 				}
 			}
@@ -179,10 +182,10 @@ public class MainFrame extends JFrame {
 
 		btnForward.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//should continue forwarding until user clicks play
+				// Continues forwarding until user clicks play
 				playClicked = false;
-				BgForward forward = new BgForward(500, video); //make a new background task
-				btnPlay.setIcon(new ImageIcon("buttons/play.png")); //first set button to play
+				btnPlay.setIcon(new ImageIcon("buttons/play.png")); // Set button to play
+				BgForward forward = new BgForward(500, video); // Make a new background task
 				forward.execute();
 			}
 		});
@@ -190,29 +193,29 @@ public class MainFrame extends JFrame {
 		
 		btnSkipForward.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//skips forward 5 seconds every time it is clicked
+				// Skips forward 5 seconds every time it is clicked
 				video.skip(5000);
 			}
 		});
 		video_control.add(btnSkipForward);
 		
-		JPanel volume_control = new JPanel(); //panel for holding the volume control buttons (jslider and mute btn)
+		JPanel volume_control = new JPanel(); // Holds the volume control buttons (JSlider and Mute button)
 		controls.add(volume_control);
 		volume_control.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_1 = new JPanel(); //panel used for layout purposes
+		JPanel panel_1 = new JPanel(); // Panel used for layout purposes
 		volume_control.add(panel_1, BorderLayout.SOUTH);
 		panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JLabel lblSound = new JLabel("Volume");
-		panel_1.add(lblSound);
-		lblSound.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		JLabel lblVolume = new JLabel("Volume"); // Label to tell user JSlider is for volume control
+		panel_1.add(lblVolume);
+		lblVolume.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
-		JSlider slider = new JSlider(); //slider for volume control
+		JSlider slider = new JSlider(); // JSlider for volume control
 		slider.addChangeListener(new ChangeListener() {
 	        @Override
 	        public void stateChanged(ChangeEvent e) {
-	        	//change the volume of the video to the value value obtained from .getVal
+	        	// Change the volume of the video to the value obtained from the slider
 	            video.setVolume(((JSlider) e.getSource()).getValue());
 	        }
 	    });
@@ -222,46 +225,45 @@ public class MainFrame extends JFrame {
 		btnMute.setIcon(new ImageIcon("buttons/mute.png"));
 		btnMute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//mute the sound when clicked, unmute when clicked again
+				// Toggle the mute for the video depending on boolean variable muteClicked
 				if(!muteClicked) {
 					btnMute.setIcon(new ImageIcon("buttons/unmute.png"));
-					video.mute(); //toggles mute for the video
+					video.mute(); // Toggles mute
 					muteClicked = true;
 				} else {
 					btnMute.setIcon(new ImageIcon("buttons/mute.png"));
-					video.mute(); //toggles mute for the video
+					video.mute(); // Toggles mute
 					muteClicked = false;
 				}
 			}
 		});
 		panel_1.add(btnMute);
-		videoPane.setMinimumSize(new Dimension(300, 500));
+		videoPane.setMinimumSize(new Dimension(300, 500)); // Sets minimum dimensions for resizing purposes
 		
 		
-		//Audio editing implementation ---------------------------------------------------->
-		JPanel audio_editing = new JPanel(); //the right side of the split pane
+		// Audio editing implementation ---------------------------------------------------->
+		JPanel audio_editing = new JPanel(); // Right side of the split pane
 		audio_editing.setLayout(new BoxLayout(audio_editing, BoxLayout.Y_AXIS));
 		audio_editing.setMinimumSize(new Dimension(300, 500));
 
-		JLabel lblEnterYourCommentary = new JLabel("Commentary here:");
+		JLabel lblEnterYourCommentary = new JLabel("Commentary here:"); // Label to tell user what the text area is for
 		lblEnterYourCommentary.setHorizontalAlignment(SwingConstants.LEFT);
 		lblEnterYourCommentary.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		lblEnterYourCommentary.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		audio_editing.add(lblEnterYourCommentary);
 		
-		final JTextArea txtrCommentary = new JTextArea();
+		final JTextArea txtrCommentary = new JTextArea(); // TextArea for user to enter their commentary
 		txtrCommentary.setText("(max 40 words)");
 		txtrCommentary.setLineWrap(true);
-		txtrCommentary.setPreferredSize(new Dimension(270, 300));
 		audio_editing.add(txtrCommentary);
 		
-		JPanel audio_options = new JPanel();
+		JPanel audio_options = new JPanel(); // Holds all buttons below JTextArea
 		audio_editing.add(audio_options);
 		
-		// Speak commentary to the user through festival text-to-speech
 		JButton btnSpeak = new JButton("Speak");
 		btnSpeak.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Speak commentary to the user through festival text-to-speech
 				String input = txtrCommentary.getText();
 				BgFestival bg = new BgFestival(input, killPID);
 				bg.execute();
@@ -273,7 +275,7 @@ public class MainFrame extends JFrame {
 		JButton btnStop = new JButton("Stop");
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// Kill the festival process (Stop speaking) --------------------------------------------------------
+				// Kill the festival process (Stop speaking)
 				if (!killPID.isEmpty()) {
 					if (killPID.get(0) != 0) {
 						festID = killPID.get(0)+4;
@@ -301,7 +303,8 @@ public class MainFrame extends JFrame {
 	   			StringTokenizer st = new StringTokenizer(words);
 	   			st.countTokens();
 	   			
-	   			if (st.countTokens() > 0 || st.countTokens() <= 40) { 		
+	   			if (st.countTokens() > 0 || st.countTokens() <= 40) {
+	   				// Prompt user for what they want to name their mp3 file
 	   				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
 	   				saveDialog.setVisible(true);
 	   			} else {
@@ -311,7 +314,7 @@ public class MainFrame extends JFrame {
 		});
 		audio_options.add(btnSaveAs);
 		
-		JPanel panel = new JPanel();
+		JPanel panel = new JPanel(); // Another panel for formatting purposes
 		audio_editing.add(panel);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
@@ -334,7 +337,6 @@ public class MainFrame extends JFrame {
 			    		
 			    		String videoPath = "bunny.avi"; // ***SOMETHING with changing to either USER SELECTED or BUNNY AVI***
 			    		File.mergeMp3(mp3Path, videoPath);
-						//int n = JOptionPane.showConfirmDialog((Component) null, "Successfully Merged "+ mp3Path +" with "+ videoPath+".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
 			    		int n = JOptionPane.showConfirmDialog((Component) null, "Successfully merged "+ File.getBasename(mp3Path) +" with "+ File.getBasename(videoPath) +".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
 			    		
 			    		if(n == 0) { // Change the video to output.avi if user selects "OK"
@@ -342,7 +344,7 @@ public class MainFrame extends JFrame {
 			    		}
 			    		
 			    	} else {
-			    		//Navigate to an error dialog
+			    		// Navigate to an error dialog
 			    		JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio file (.mp3).");
 			    	}
 			    }
@@ -351,58 +353,58 @@ public class MainFrame extends JFrame {
 		panel.add(btnMerge);
 		
 		
-		//Adding the two different panels to the two sided of the split pane ---------------->
+		// Adding the two different panels to the two sides of the split pane ---------------->
 		JSplitPane splitPane = new JSplitPane();
 		setContentPane(splitPane);
-		splitPane.setResizeWeight(0.8); //resizes the frames in a 8:2 ratio
+		splitPane.setResizeWeight(0.8); // Resizes the frames in a 8:2 ratio
 		splitPane.setLeftComponent(videoPane);
 		splitPane.setRightComponent(audio_editing);
 		splitPane.setDividerLocation(700 + splitPane.getInsets().left);
 		
 		
-		//video manipulation implementation ------------------------------------------------->
-		this.setVisible(true); //set the frame to visible before playing the video
+		// Video manipulation implementation ------------------------------------------------->
+		this.setVisible(true); // Set the frame to visible before playing the video
 		
-		video.playMedia(videoPath); //play the video
-		video.setVolume(50); //set initial volume to 50 (same as JSlider)
+		video.playMedia(videoPath); // Play the video
+		video.setVolume(50); // Set initial volume to 50 (same as JSlider default value)
 		
 		video.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
 		    @Override
 		    public void finished(MediaPlayer mediaPlayer) {
-		        //button to play when media player finished playing...
+		        // Play button for playing again when video finishes playing
 		    	playClicked = false;
 		    	btnPlay.setIcon(new ImageIcon("buttons/play.png"));
-		    	stopForward = true;
+		    	stopForward = true; // For stopping the BgForward SwingWorker implementation (fast forwarding)
 		    }
 		});
 		
-		final int[] vidLength = {0}; //initailise as array so final value can be changed
+		final int[] vidLength = {0}; // Initialize as array so final value can be changed
 		while(vidLength[0] == 0) {
 			vidLength[0] = (int)((video.getLength())/1000);
 		}
 		
 		bar.setMaximum(vidLength[0]);
 		
-		//timer for updating the label and progress bar every second
+		// Timer for updating the label and progress bar every half a second
 		Timer timer = new Timer(500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lblTime.setText((video.getTime())/1000+ " secs"); //update the label
-				bar.setValue((int)(video.getTime())/1000); //update the progress bar
+				lblTime.setText((video.getTime())/1000+ " s"); // Update the label
+				bar.setValue((int)(video.getTime())/1000); // Update the progress bar
 				if(video.getLength() == 0) {
-					//if video gets to the beginning or video get to the end, stop the rewinding and fast forwarding
+					// If video gets to the end, stop the rewinding
 					stopForward = true;
 				}
 			}
 		});
 		timer.start();
 		
-		//to fix problem for video being muted when last video exits while muted.
+		// For fixing problem where video being muted to start with, when last execution exits while muted.
 	    addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e)
             {
             	e.getWindow().dispose();
-            	//if the video is muted, unmuted before exiting the program
+            	// If the video is muted, unmuted before exiting the program
             	if(muteClicked) {
 		    		video.mute();
 		    	}
