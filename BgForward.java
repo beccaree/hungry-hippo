@@ -21,6 +21,10 @@ public class BgForward extends SwingWorker<Void, Void> {
 		this.video = video;
 	}
 	
+	/* 
+	 * Uses javas.swing.Timer to continually skip bits of video to simulate fast forward and rewind
+	 * @see javax.swing.SwingWorker#doInBackground()
+	 */
 	@Override
 	protected Void doInBackground() throws Exception {
 		
@@ -31,10 +35,10 @@ public class BgForward extends SwingWorker<Void, Void> {
 					if(!MainFrame.stopForward) { // And While it is not the start or end of the video
 						video.skip(interval);
 					} else {
-						((Timer)e.getSource()).stop(); // Start or end is reached
+						((Timer)e.getSource()).stop(); 
 					}
 				} else {
-					((Timer)e.getSource()).stop(); // User has clicked play
+					((Timer)e.getSource()).stop();
 				}
 			}
 		});
