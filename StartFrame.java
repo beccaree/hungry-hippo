@@ -3,6 +3,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -140,7 +141,7 @@ public class StartFrame extends JFrame {
 					new MainFrame(videoPath);	
 				} else { //if the user has not chosen a video
 					//Navigate to an error dialog
-					System.out.println("goes to error dialog");
+					JOptionPane.showMessageDialog(thisFrame, "The file you have chosen is not a video, please try again.");
 				}			
 
 			}
