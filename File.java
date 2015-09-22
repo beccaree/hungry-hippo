@@ -59,4 +59,32 @@ public class File {
 		return false;
 		
 	}
+	
+	protected static void mergeMp3(String mp3Path, String videoPath) {
+		try {
+			String cmd = "ffmpeg -i " + videoPath + " -map 0:1 vidAudio.mp3";
+			startProcess(cmd);
+			
+			cmd = "rm -r output.mp3";
+			startProcess(cmd);
+			
+			cmd = "ffmpeg -i " + mp3Path + " -i vidAudio.mp3 -filter_complex amix=inputs=2 output.mp3";
+			startProcess(cmd);
+			
+			cmd = "rm -r output.avi";
+			startProcess(cmd);
+			
+			cmd = "ffmpeg -i output.mp3 -i " + videoPath + " -map 0:0 -map 1:0 -acodec copy -vcodec copy output.avi";
+			startProcess(cmd);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}					
+		
+		System.out.println("merged video: make sure to play merged video, hide video called .output.avi, when done testing");
+	}
+	
+	private static void startProcess(String cmd) throws IOException{
+		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
+		builder.start();
+	}
 }
