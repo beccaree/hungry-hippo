@@ -32,7 +32,7 @@ public class BgFestival extends SwingWorker<Void, Void> {
 			// read the output of the cmd to get the process ID for killing if
 			// necessary
 			InputStream stdout = process.getInputStream();
-			BufferedReader stoutbr = new BufferedReader(new InputStreamReader(stdout));
+			BufferedReader stdoutbr = new BufferedReader(new InputStreamReader(stdout));
 			String line = stdoutbr.readLine();
 			festID = Integer.parseInt(line); // store ID for cancelling later
 			System.out.println(festID);
