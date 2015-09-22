@@ -117,5 +117,15 @@ public class File {
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 		builder.start();
 	}
+	
+	/**
+	 * Gets the basename of a file path and returns it as a string
+	 * @param path
+	 * @return
+	 */
+	protected static String getBasename(String path){
+		int index = path.lastIndexOf('/');
+		return path.substring(index+1); // Get string after index+1 (basename)		
+	}
 }
 
