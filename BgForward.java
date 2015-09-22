@@ -21,10 +21,15 @@ public class BgForward extends SwingWorker<Void, Void> {
 	@Override
 	protected Void doInBackground() throws Exception {
 		
+		//skip by interval every time timer clicks, negative = rewind, positive = forward
 		Timer timer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!MainFrame.playClicked) {
-					video.skip(interval);
+					if(!MainFrame.stopForward) {
+						video.skip(interval);
+					} else {
+						((Timer)e.getSource()).stop();
+					}
 				} else {
 					((Timer)e.getSource()).stop();
 				}
