@@ -80,7 +80,7 @@ public class saveAsDialog extends JDialog {
 								bw.write(commentary);
 								bw.close();
 
-								cmd = "text2wave " + textPath + " -o .sound.wav";
+								cmd = "text2wave " + textPath + " -o sound.wav";
 								startProcess(cmd);		
 								
 								cmd = "find | grep -x \"./MP3 Files/" + textField.getText() +".mp3\" | wc -l";
@@ -92,7 +92,7 @@ public class saveAsDialog extends JDialog {
 								String line = stdoutBuffered.readLine();								
 								
 								if(line.equals("0")){
-									cmd = "ffmpeg -i .sound.wav " + "\'MP3 Files/" + textField.getText() + ".mp3\'";
+									cmd = "ffmpeg -i sound.wav " + "\'MP3 Files/" + textField.getText() + ".mp3\'";
 									Thread.sleep(200);
 									startProcess(cmd);
 								
