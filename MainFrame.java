@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -35,7 +36,12 @@ import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 
 import java.awt.Component;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import javax.swing.SwingConstants;
 
@@ -48,14 +54,17 @@ public class MainFrame extends JFrame {
 	int festID = 0; //because process ID is very unlikely to be 0
 	static boolean playClicked = true;
 	static boolean muteClicked = false;
+	private ArrayList<Integer> killPID = new ArrayList<Integer>();
 	
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
+	private String videoPath;
 	
 	/**
 	 * Create the frame.
 	 */
 	public MainFrame(String videoPath) {
+		this.videoPath = videoPath;
 		setTitle("VIDIVOX by twerking-hippo :)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
@@ -72,7 +81,7 @@ public class MainFrame extends JFrame {
 		mntmOpenNewVideo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//changing the video that we are editing
-				//promt user for the video
+				//prompt user for the video
 				String newPath;
 				JFileChooser videoChooser = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
@@ -295,8 +304,8 @@ public class MainFrame extends JFrame {
 	   			st.countTokens();
 	   			
 	   			if (st.countTokens() <= 40){				
-				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
-				saveDialog.setVisible(true);
+	   				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
+	   				saveDialog.setVisible(true);
 	   			}else{
 	   				JOptionPane.showMessageDialog(thisFrame, "Numbers of words in commentary exceeds 40. Please try again.");
 	   			}
@@ -326,35 +335,12 @@ public class MainFrame extends JFrame {
 			    	mp3Path = mp3Chooser.getSelectedFile().getPath();
 			    	System.out.println(mp3Path);
 			    }
-			    
-			    //Determine whether it is an mp3 file
-			    String cmd = "file "+ mp3Path;
-			    boolean ismp3 = false;
-				
-				//Determine if file chosen is a video file
-				ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", cmd);
-				Process process;
-				try {
-					process = processBuilder.start();
-					InputStream output = process.getInputStream();
-					BufferedReader stdout = new BufferedReader(new InputStreamReader(output));
 
-					String line = null;
-					while ((line = stdout.readLine()) != null) {
-						if (line.matches("(.*): Audio file(.*)")){
-							ismp3 = true;
-						}
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				
-
-				if(ismp3){
+				if(/*File.isMp3(mp3Path)*/true){
 					//merge mp3 with current video 
 					String videoPath = "bunny.avi";
 					try {
-						cmd = "ffmpeg -i " + videoPath + " -map 0:1 vidAudio.mp3";
+						String cmd = "ffmpeg -i " + videoPath + " -map 0:1 vidAudio.mp3";
 						startProcess(cmd);
 						
 						cmd = "rm -r output.mp3";
@@ -376,7 +362,7 @@ public class MainFrame extends JFrame {
 					
 				}else{
 					//Navigate to an error dialog
-					JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is a video.");
+					JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio (.MP3).");
 					System.out.println("goes to error dialog");
 				}
 				
