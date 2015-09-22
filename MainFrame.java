@@ -367,8 +367,7 @@ public class MainFrame extends JFrame {
 					JOptionPane.showMessageDialog(thisFrame, "Please make sure the file you have chosen is an audio (.MP3).");
 					System.out.println("goes to error dialog");
 				}
-				
-				
+
 			}
 		});
 		panel.add(btnMerge);
@@ -420,8 +419,7 @@ public class MainFrame extends JFrame {
 		timer.start();
 		
 		//to fix problem for video being muted when last video exits while muted.
-	    addWindowListener(new WindowAdapter()
-        {
+	    addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e)
             {
@@ -433,6 +431,7 @@ public class MainFrame extends JFrame {
             }
         });
 	}
+	
 	public void startProcess(String cmd) throws IOException{
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 		builder.start();
