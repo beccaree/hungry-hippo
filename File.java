@@ -74,13 +74,17 @@ public class File {
 			cmd = "rm -r output.avi";
 			startProcess(cmd);
 			
+			Thread.sleep(200); //must sleep for previous command to finish executing
+			
 			cmd = "ffmpeg -i output.mp3 -i " + videoPath + " -map 0:0 -map 1:0 -acodec copy -vcodec copy output.avi";
 			startProcess(cmd);
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}					
-		
-		System.out.println("merged video: make sure to play merged video, hide video called .output.avi, when done testing");
 	}
 	
 	private static void startProcess(String cmd) throws IOException{
