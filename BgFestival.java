@@ -6,6 +6,10 @@ import java.util.ArrayList;
 
 import javax.swing.SwingWorker;
 
+/**
+ * @author Isabel Zhaung and Rebecca Lee
+ * Class executes festival text-to-speech from commentary entered by the user
+ */
 public class BgFestival extends SwingWorker<Void, Void> {
 
 	protected int festID;
@@ -17,25 +21,24 @@ public class BgFestival extends SwingWorker<Void, Void> {
 		this.killPID = killPID;
 	}
 
+	/* 
+	 * Uses festival to speak out the commentary to the user
+	 * @see javax.swing.SwingWorker#doInBackground()
+	 */
 	@Override
 	protected Void doInBackground() throws Exception {
 
 		try {
-			// festival to speak out commentary by the user
-			String cmd = "echo \"" + input + "\" | festival --tts & echo $!";
-			// echo $! from the cmd above returns the process ID of the process
-			// that has just been executed
+			String cmd = "echo \"" + input + "\" | festival --tts & echo $!"; // echo $! returns the process ID of the process just executed
 
 			ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 			Process process = builder.start();
 
-			// read the output of the cmd to get the process ID for killing if
-			// necessary
+			// Read the process ID for the process executed above
 			InputStream stdout = process.getInputStream();
 			BufferedReader stdoutbr = new BufferedReader(new InputStreamReader(stdout));
 			String line = stdoutbr.readLine();
-			festID = Integer.parseInt(line); // store ID for cancelling later
-			System.out.println(festID);
+			festID = Integer.parseInt(line); // Stores ID for canceling(Stop)
 
 			System.out.println("Be 0:" + killPID.size());
 			killPID.add(festID);
@@ -49,3 +52,4 @@ public class BgFestival extends SwingWorker<Void, Void> {
 	}
 
 }
+
