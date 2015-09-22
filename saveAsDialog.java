@@ -37,7 +37,7 @@ public class saveAsDialog extends JDialog {
     public saveAsDialog(final String commentary) {
     	
     	final JDialog thisDialog = this;
-    	dir = System.getProperty("user.dir") + "/MP3 Files/";
+    	dir = System.getProperty("user.dir") + "/MP3Files/";
     	new File(dir).mkdir();
     	
         setBounds(200, 200, 450, 250);
@@ -46,7 +46,7 @@ public class saveAsDialog extends JDialog {
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(null);
         
-        JLabel lblNameYourMp = new JLabel("Name your  MP3 file");
+        JLabel lblNameYourMp = new JLabel("Name your MP3 file");
         lblNameYourMp.setFont(new Font("Tahoma", Font.PLAIN, 20));
         lblNameYourMp.setHorizontalAlignment(SwingConstants.CENTER);
         lblNameYourMp.setBounds(75, 44, 275, 40);
@@ -75,7 +75,7 @@ public class saveAsDialog extends JDialog {
 				   		
 							try {
 
-							textPath = System.getProperty("user.dir")+ "/.commentary.txt";
+								textPath = System.getProperty("user.dir")+ "/.commentary.txt";
 								BufferedWriter bw = new BufferedWriter(new FileWriter(textPath, false));
 								bw.write(commentary);
 								bw.close();
@@ -83,7 +83,7 @@ public class saveAsDialog extends JDialog {
 								cmd = "text2wave " + textPath + " -o sound.wav";
 								startProcess(cmd);		
 								
-								cmd = "find | grep -x \"./MP3 Files/" + textField.getText() +".mp3\" | wc -l";
+								cmd = "find | grep -x \"./MP3Files/" + textField.getText() +".mp3\" | wc -l";
 								startProcess(cmd);
 								
 								builder.redirectErrorStream(true);
@@ -92,13 +92,14 @@ public class saveAsDialog extends JDialog {
 								String line = stdoutBuffered.readLine();								
 								
 								if(line.equals("0")){
-									cmd = "ffmpeg -i sound.wav " + "\'MP3 Files/" + textField.getText() + ".mp3\'";
+									cmd = "ffmpeg -i sound.wav " + "\'MP3Files/" + textField.getText() + ".mp3\'";
 									Thread.sleep(200);
 									startProcess(cmd);
+									JOptionPane.showMessageDialog(thisDialog, "Successfully saved "+textField.getText() +".mp3");
 								
 									thisDialog.dispose();
 								
-								}else{
+								} else {
 									JOptionPane.showMessageDialog(thisDialog, "This name is taken. Please choose another.");
 								}
 								
