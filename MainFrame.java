@@ -305,14 +305,13 @@ public class MainFrame extends JFrame {
 	   			StringTokenizer st = new StringTokenizer(words);
 	   			st.countTokens();
 	   			
-	   			if (st.countTokens() <= 40){				
+	   			if (st.countTokens() <= 40 || st.countTokens() == 0) { //check that the number of words is more than 0 but less than 40		
 	   				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
 	   				saveDialog.setVisible(true);
-	   			}else{
+	   			} else {
 	   				JOptionPane.showMessageDialog(thisFrame, "Numbers of words in commentary exceeds 40. Please try again.");
 	   			}
-				
-				
+
 			}
 		});
 		audio_options.add(btnSaveAs);
