@@ -19,11 +19,6 @@ import java.awt.Font;
 
 import javax.swing.JTextField;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 
@@ -88,7 +83,7 @@ public class StartFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				
 				// Allows user to choose their own video file to play
-				JFileChooser videoChooser = new JFileChooser();
+				JFileChooser videoChooser = new JFileChooser(System.getProperty("user.dir") + "/VideoFiles/");
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
 				videoChooser.setFileFilter(filter);
 				int okReturnVal = videoChooser.showOpenDialog(getParent());
@@ -119,7 +114,7 @@ public class StartFrame extends JFrame {
 
 				if(chckbxDefaultVid.isSelected()) { // If the user chooses to use the bunny video
 					thisFrame.dispose();
-					new MainFrame("bunny.avi");
+					new MainFrame("./VideoFiles/bunny.avi");
 				} else if(File.isVideo(videoPath)) { // If the user has chosen a video
 					thisFrame.dispose();
 					new MainFrame(videoPath);	
