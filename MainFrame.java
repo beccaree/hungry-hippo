@@ -36,10 +36,7 @@ import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 
 import java.awt.Component;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -63,15 +60,17 @@ public class MainFrame extends JFrame {
 	
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
+	protected static String currentVideoPath;
 	
 	/**
 	 * Create the frame.
 	 */
 	public MainFrame(String videoPath) {
-		setTitle("VIDIVOX by twerking-hippo :)");
+		setTitle("VIDIVOX prototype - Video editing Platform");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 50, 1000, 650);
 		final JFrame thisFrame = this;
+		currentVideoPath = videoPath;
 		
 		// Top menu bar implementation -------------------------------------------------->
 		JMenuBar menuBar = new JMenuBar();
@@ -86,7 +85,7 @@ public class MainFrame extends JFrame {
 				// Changing the video that we are editing
 				// Prompt user for the video they want to change to
 				String newPath;
-				JFileChooser videoChooser = new JFileChooser();
+				JFileChooser videoChooser = new JFileChooser(System.getProperty("user.dir") + "/VideoFiles/");
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Video File", "avi");
 				videoChooser.setFileFilter(filter);
 				int okReturnVal = videoChooser.showOpenDialog(getParent());
@@ -95,6 +94,7 @@ public class MainFrame extends JFrame {
 					// Check if file chosen is a video, if yes, change video, if not, show error dialog and do nothing
 					if(File.isVideo(newPath)) {
 						video.playMedia(newPath);
+						File.setCurrentVideoPath(newPath);
 					} else {
 						JOptionPane.showMessageDialog(thisFrame, "The file you have chosen is not a video, please try again.");
 					}
@@ -211,6 +211,8 @@ public class MainFrame extends JFrame {
 		panel_1.add(lblVolume);
 		lblVolume.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
+		final JButton btnMute = new JButton(); // Initialize btnMute here for use in JSlider actionListener
+		
 		JSlider slider = new JSlider(); // JSlider for volume control
 		slider.addChangeListener(new ChangeListener() {
 	        @Override
@@ -221,7 +223,6 @@ public class MainFrame extends JFrame {
 	    });
 		panel_1.add(slider);
 		
-		final JButton btnMute = new JButton();
 		btnMute.setIcon(new ImageIcon("buttons/mute.png"));
 		btnMute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -326,7 +327,7 @@ public class MainFrame extends JFrame {
 				String mp3Path = null;
 				
 				// Let user select an mp3
-				JFileChooser mp3Chooser = new JFileChooser();
+				JFileChooser mp3Chooser = new JFileChooser(System.getProperty("user.dir") + "/MP3Files/");
 			    FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 File", "mp3");
 			    mp3Chooser.setFileFilter(filter);
 			    int okReturnVal = mp3Chooser.showOpenDialog(getParent());
@@ -335,12 +336,13 @@ public class MainFrame extends JFrame {
 
 			    	if(File.isMp3(mp3Path)){
 			    		
-			    		String videoPath = "bunny.avi"; // ***SOMETHING with changing to either USER SELECTED or BUNNY AVI***
+			    		String videoPath = File.getCurrentVideoPath(); // Video to merge with is the one currently playing
 			    		File.mergeMp3(mp3Path, videoPath);
 			    		int n = JOptionPane.showConfirmDialog((Component) null, "Successfully merged "+ File.getBasename(mp3Path) +" with "+ File.getBasename(videoPath) +".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
 			    		
 			    		if(n == 0) { // Change the video to output.avi if user selects "OK"
-		    				video.playMedia("output.avi");
+		    				video.playMedia("VideoFiles/output.avi");
+		    				File.setCurrentVideoPath("VideoFiles/output.avi");
 			    		}
 			    		
 			    	} else {
@@ -365,7 +367,7 @@ public class MainFrame extends JFrame {
 		// Video manipulation implementation ------------------------------------------------->
 		this.setVisible(true); // Set the frame to visible before playing the video
 		
-		video.playMedia(videoPath); // Play the video
+		video.playMedia(currentVideoPath); // Play the video
 		video.setVolume(50); // Set initial volume to 50 (same as JSlider default value)
 		
 		video.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
