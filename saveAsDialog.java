@@ -38,8 +38,6 @@ public class saveAsDialog extends JDialog {
     public saveAsDialog(final String commentary) {
     	
     	final JDialog thisDialog = this;
-    	dir = System.getProperty("user.dir") + "/MP3Files/";
-    	new File(dir).mkdir();
     	
         setBounds(200, 200, 450, 250);
         getContentPane().setLayout(new BorderLayout());
@@ -77,8 +75,8 @@ public class saveAsDialog extends JDialog {
         				bw.write(commentary);
         				bw.close();
 								
-        				// Generate a sound.wav file from the saved user commentary
-        				cmd = "text2wave " + textPath + " -o sound.wav";
+        				// Generate a hidden sound.wav file from the saved user commentary
+        				cmd = "text2wave " + textPath + " -o ./MP3Files/.sound.wav";
         				startProcess(cmd);		
 								
         				// Find out if any .mp3 file in MP3Files folder has the same name user has entered for MP3 file name
@@ -93,10 +91,10 @@ public class saveAsDialog extends JDialog {
 								
         				// Generate an .mp3 file if none already exists
         				if(line.equals("0")) {
-							cmd = "ffmpeg -i sound.wav " + "\'MP3Files/" + textField.getText() + ".mp3\'";
+							cmd = "ffmpeg -i ./MP3Files/.sound.wav \'./MP3Files/" + textField.getText() + ".mp3\'";
         					startProcess(cmd);
 									
-        					JOptionPane.showMessageDialog(thisDialog, "Successfully saved "+ textField.getText() +".mp3");								
+        					JOptionPane.showMessageDialog(thisDialog, "Successfully saved "+ textField.getText() +".mp3 to MP3Files");								
         					thisDialog.dispose();
 								
         				} else {
