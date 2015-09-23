@@ -79,27 +79,27 @@ public class File {
 	protected static void mergeMp3(String mp3Path, String videoPath) {
 		try {
 			// Creates an mp3 file from the existing video's audio
-			String cmd = "ffmpeg -i " + videoPath + " -map 0:1 vidAudio.mp3";
+			String cmd = "ffmpeg -i " + videoPath + " -map 0:1 ./MP3Files/.vidAudio.mp3";
 			startProcess(cmd);
 			
 			// Deletes any existing output.mp3 file
-			cmd = "rm -r output.mp3";
+			cmd = "rm -r ./MP3Files/.output.mp3";
 			startProcess(cmd);
 			
 			Thread.sleep(200); // Stops thread from continuing(sleep) so previous command can finish executing
 			
 			// Creates an mp3 file output.mp3 that combines the video audio and selected mp3 audio for merging 
-			cmd = "ffmpeg -i " + mp3Path + " -i vidAudio.mp3 -filter_complex amix=inputs=2 output.mp3";
+			cmd = "ffmpeg -i " + mp3Path + " -i ./MP3Files/.vidAudio.mp3 -filter_complex amix=inputs=2 ./MP3Files/.output.mp3";
 			startProcess(cmd);
 			
 			// Deletes any existing output.avi file
-			cmd = "rm -r output.avi";
+			cmd = "rm -r ./VideoFiles/output.avi";
 			startProcess(cmd);
 			
 			Thread.sleep(200); // Stops thread from continuing(sleep) so previous command can finish executing
 			
 			// Creates an output.avi file from merging combined audio (0:0) and existing video stream (1:0)
-			cmd = "ffmpeg -i output.mp3 -i " + videoPath + " -map 0:0 -map 1:0 -acodec copy -vcodec copy output.avi";
+			cmd = "ffmpeg -i ./MP3Files/.output.mp3 -i " + videoPath + " -map 0:0 -map 1:0 -acodec copy -vcodec copy ./VideoFiles/output.avi";
 			startProcess(cmd);
 			
 		} catch (IOException e1) {
@@ -128,6 +128,22 @@ public class File {
 	protected static String getBasename(String path){
 		int index = path.lastIndexOf('/');
 		return path.substring(index+1); // Get string after index+1 (basename)		
+	}
+
+	/**
+	 * Sets the videoPath of current video
+	 * @param newPath
+	 */
+	public static void setCurrentVideoPath(String newPath) {
+		MainFrame.currentVideoPath = newPath;
+	}
+	
+	/**
+	 * Returns the videoPath of current video
+	 * @return
+	 */
+	public static String getCurrentVideoPath() {
+		return MainFrame.currentVideoPath;
 	}
 }
 
