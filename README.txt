@@ -37,8 +37,8 @@ The user can choose to name this file.
 
 [Merge With MP3]:
 This will merge any .mp3 file chosen by the user and merge it with the currently playing video.
-It will then prompt the user to choose if they want to play the newly merged video after it is made.
-
+It will first prompt the user to choose the .mp3 file they want to merge with the video.
+Then it will ask the user to name their output video and then prompt the user to choose if they want to play the newly merged video after it is made.
 
 
 Further Options:
@@ -47,8 +47,3 @@ In the current folder, 'Overlaying Audio with Video' produces 3 intermediate fil
 sound.wav: MP3Files
 vidAudio.mp3: MP3Files
 output.mp3: MP3Files
-
-A visible file called output.avi is in the folder VideoFiles and is the most recently combined video with the chosen .mp3 from [Merge With MP3].
-
-output.avi: VideoFiles
-
