@@ -1,4 +1,4 @@
-package VIDIVOX_prototype;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -63,8 +63,7 @@ public class saveAsDialog extends JDialog {
         		if(type.equals("mp3")) {
         			File.saveAsMp3(commentary, textField.getText(), thisDialog);
         		} else {
-        			MainFrame.videoName = textField.getText();
-        			MainFrame.videoNamed = true;
+        			MainFrame.videoName = textField.getText();        			
         			thisDialog.dispose();
         		}	
         	}
