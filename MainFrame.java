@@ -1,3 +1,4 @@
+package VIDIVOX_prototype;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -61,6 +62,9 @@ public class MainFrame extends JFrame {
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
 	protected static String currentVideoPath;
+	protected static String mp3Name = null;
+	protected static String videoName = null;
+	protected static boolean videoNamed = false;
 	
 	/**
 	 * Create the frame.
@@ -306,7 +310,7 @@ public class MainFrame extends JFrame {
 	   			
 	   			if (st.countTokens() > 0 || st.countTokens() <= 40) {
 	   				// Prompt user for what they want to name their mp3 file
-	   				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
+	   				JDialog saveDialog = new saveAsDialog("mp3", txtrCommentary.getText());
 	   				saveDialog.setVisible(true);
 	   			} else {
 	   				JOptionPane.showMessageDialog(thisFrame, "Enter between 1 and 40 words. Please try again.");
@@ -323,7 +327,12 @@ public class MainFrame extends JFrame {
 		JButton btnMerge = new JButton("Merge With MP3");
 		btnMerge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				
+				// Prompt user for a merged video name
+				saveAsDialog saveVideo = new saveAsDialog("video", null);
+				saveVideo.setModal(true);
+				saveVideo.setVisible(true);
+				
 				String mp3Path = null;
 				
 				// Let user select an mp3
@@ -335,14 +344,13 @@ public class MainFrame extends JFrame {
 			    	mp3Path = mp3Chooser.getSelectedFile().getPath();
 
 			    	if(File.isMp3(mp3Path)){
-			    		
 			    		String videoPath = File.getCurrentVideoPath(); // Video to merge with is the one currently playing
 			    		File.mergeMp3(mp3Path, videoPath);
 			    		int n = JOptionPane.showConfirmDialog((Component) null, "Successfully merged "+ File.getBasename(mp3Path) +" with "+ File.getBasename(videoPath) +".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
 			    		
 			    		if(n == 0) { // Change the video to output.avi if user selects "OK"
-		    				video.playMedia("VideoFiles/output.avi");
-		    				File.setCurrentVideoPath("VideoFiles/output.avi");
+		    				video.playMedia("VideoFiles/"+videoName+".avi");
+		    				File.setCurrentVideoPath(System.getProperty("user.dir") + "VideoFiles/"+videoName+".avi");
 			    		}
 			    		
 			    	} else {
