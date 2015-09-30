@@ -1,4 +1,6 @@
+package VIDIVOX_prototype;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -13,29 +15,22 @@ import javax.swing.JTextField;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 
+/** 
+ * @author Isabel Zhuang and Rebecca Lee
+ * Class contains implementation for generating a dialog for naming an mp3 or video file.
+ */
 public class saveAsDialog extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTextField textField;
-	private String cmd;
-	private String textPath;
-	private ProcessBuilder builder;
-	private Process process;
-	private String dir;
+    protected boolean cancelClicked;
 	
     /**
      * Create the dialog.
      */
-    public saveAsDialog(final String commentary) {
+    public saveAsDialog(final String type, final String commentary) {
     	
     	final JDialog thisDialog = this;
     	
@@ -45,13 +40,16 @@ public class saveAsDialog extends JDialog {
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(null);
         
-        JLabel lblNameYourMp = new JLabel("Name your MP3 file");
-        lblNameYourMp.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        lblNameYourMp.setHorizontalAlignment(SwingConstants.CENTER);
-        lblNameYourMp.setBounds(75, 44, 275, 40);
-        contentPanel.add(lblNameYourMp);
+        JLabel lblNameYour = new JLabel("Name your MP3 file");
+        if(type.equals("video")) {
+        	lblNameYour = new JLabel("Name your merged video file");
+        }
+        lblNameYour.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        lblNameYour.setHorizontalAlignment(SwingConstants.CENTER);
+        lblNameYour.setBounds(75, 44, 275, 40);
+        contentPanel.add(lblNameYour);
         
-        JLabel lblMpName = new JLabel("MP3 name:");
+        JLabel lblMpName = new JLabel("Name:");
         lblMpName.setBounds(90, 130, 110, 20);
         contentPanel.add(lblMpName);
         
@@ -67,46 +65,14 @@ public class saveAsDialog extends JDialog {
         JButton okButton = new JButton("OK");
         okButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-				if (commentary != null) {
-				   		
-        			try {
-        				textPath = System.getProperty("user.dir")+ "/.commentary.txt"; // Generate a hidden .txt file containing user commentary
-        				BufferedWriter bw = new BufferedWriter(new FileWriter(textPath, false));
-        				bw.write(commentary);
-        				bw.close();
-								
-        				// Generate a hidden sound.wav file from the saved user commentary
-        				cmd = "text2wave " + textPath + " -o ./MP3Files/.sound.wav";
-        				startProcess(cmd);		
-								
-        				// Find out if any .mp3 file in MP3Files folder has the same name user has entered for MP3 file name
-        				cmd = "find | grep -x \"./MP3Files/" + textField.getText() +".mp3\" | wc -l";
-        				startProcess(cmd);
-								
-        				builder.redirectErrorStream(true);
-        				InputStream stdout = process.getInputStream();
-        				BufferedReader stdoutBuffered =	new BufferedReader(new InputStreamReader(stdout));
-								
-        				String line = stdoutBuffered.readLine();								
-								
-        				// Generate an .mp3 file if none already exists
-        				if(line.equals("0")) {
-							cmd = "ffmpeg -i ./MP3Files/.sound.wav \'./MP3Files/" + textField.getText() + ".mp3\'";
-        					startProcess(cmd);
-									
-        					JOptionPane.showMessageDialog(thisDialog, "Successfully saved "+ textField.getText() +".mp3 to MP3Files");								
-        					thisDialog.dispose();
-								
-        				} else {
-        					// Error dialog if name of mp3 already exists
-        					JOptionPane.showMessageDialog(thisDialog, "This name is taken. Please choose another.");
-        				}
-								
-        			} catch (IOException e1) {
-        				e1.printStackTrace();
-        			}
-        		}
-			}
+        		// Compares if dialog is used for naming an mp3 file or video
+        		if(type.equals("mp3")) {
+        			File.saveAsMp3(commentary, textField.getText(), thisDialog); // Will save commentary as mp3
+        		} else {
+        			MainFrame.videoName = textField.getText(); // Gets the user-entered video name for executing further commands      			
+        			thisDialog.dispose();
+        		}	
+        	}
 		});
         okButton.setActionCommand("OK");
         buttonPane.add(okButton);
@@ -114,18 +80,13 @@ public class saveAsDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
+        		cancelClicked = true;
         		thisDialog.dispose();
         	}
 	});
         cancelButton.setActionCommand("Cancel");
         buttonPane.add(cancelButton);
     
-    }
-    
-    public void startProcess(String cmd) throws IOException{
-    	// Builds the process for the Bash command cmd
-    	builder = new ProcessBuilder("/bin/bash", "-c", cmd);
-		process = builder.start();
     }
 }
 
