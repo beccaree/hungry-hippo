@@ -1,3 +1,4 @@
+package VIDIVOX_prototype;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -36,7 +37,12 @@ import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 
 import java.awt.Component;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -61,6 +67,8 @@ public class MainFrame extends JFrame {
 	private final EmbeddedMediaPlayerComponent component;
 	private final MediaPlayer video;
 	protected static String currentVideoPath;
+	protected static String mp3Name = null;
+	protected static String videoName = null;
 	
 	/**
 	 * Create the frame.
@@ -306,7 +314,7 @@ public class MainFrame extends JFrame {
 	   			
 	   			if (st.countTokens() > 0 || st.countTokens() <= 40) {
 	   				// Prompt user for what they want to name their mp3 file
-	   				JDialog saveDialog = new saveAsDialog(txtrCommentary.getText());
+	   				JDialog saveDialog = new saveAsDialog("mp3", txtrCommentary.getText());
 	   				saveDialog.setVisible(true);
 	   			} else {
 	   				JOptionPane.showMessageDialog(thisFrame, "Enter between 1 and 40 words. Please try again.");
@@ -323,7 +331,7 @@ public class MainFrame extends JFrame {
 		JButton btnMerge = new JButton("Merge With MP3");
 		btnMerge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+								
 				String mp3Path = null;
 				
 				// Let user select an mp3
@@ -336,14 +344,45 @@ public class MainFrame extends JFrame {
 
 			    	if(File.isMp3(mp3Path)){
 			    		
-			    		String videoPath = File.getCurrentVideoPath(); // Video to merge with is the one currently playing
-			    		File.mergeMp3(mp3Path, videoPath);
-			    		int n = JOptionPane.showConfirmDialog((Component) null, "Successfully merged "+ File.getBasename(mp3Path) +" with "+ File.getBasename(videoPath) +".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
-			    		
-			    		if(n == 0) { // Change the video to output.avi if user selects "OK"
-		    				video.playMedia("VideoFiles/output.avi");
-		    				File.setCurrentVideoPath("VideoFiles/output.avi");
-			    		}
+			    		// Prompt user for a merged video name
+						saveAsDialog saveVideo = new saveAsDialog("video", null);
+						saveVideo.setModal(true);
+						saveVideo.setVisible(true);
+						
+						try {
+							
+							// Find out if any .mp3 file in MP3Files folder has the same name user has entered for MP3 file name
+							String cmd = "find | grep -x \"./VideoFiles/" + videoName +".avi\" | wc -l";
+							ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
+							Process process = builder.start();
+							
+							builder.redirectErrorStream(true);
+							InputStream stdout = process.getInputStream();
+							BufferedReader stdoutBuffered =	new BufferedReader(new InputStreamReader(stdout));
+									
+							String line = stdoutBuffered.readLine();								
+									
+							// Generate an .avi file if none already exists
+							if(!saveVideo.cancelClicked){
+								if(line.equals("0")) {
+									String videoPath = File.getCurrentVideoPath(); // Video to merge with is the one currently playing
+									File.mergeMp3(mp3Path, videoPath);
+									int n = JOptionPane.showConfirmDialog((Component) null, "Successfully merged "+ File.getBasename(mp3Path) +" with "+ File.getBasename(videoPath) +".\n Would you like to play it now?", "alert", JOptionPane.OK_CANCEL_OPTION);
+					    		
+					    			if(n == 0) { // Change the video to output.avi if user selects "OK"
+					    				video.playMedia("VideoFiles/"+videoName+".avi");
+					    				File.setCurrentVideoPath(System.getProperty("user.dir") + "VideoFiles/"+videoName+".avi");
+					    			}
+									
+								} else {
+									// Error dialog if name of mp3 already exists
+									JOptionPane.showMessageDialog(thisFrame, "This name is taken. Please choose another.");
+								}
+							}
+									
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}			    		
 			    		
 			    	} else {
 			    		// Navigate to an error dialog
